@@ -1,0 +1,79 @@
+import { createContext, useContext, useEffect, useState } from "react";
+
+const AuthContext = createContext(undefined);
+const SupabaseContext = createContext(undefined);
+
+export const AuthContextProvider = ({ children, supabase }) => {
+  const [session, setSession] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setLoading(false);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      setLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [supabase.auth]);
+
+  const authContextValue = {
+    session,
+    user: session && session.user,
+    loading: loading,
+    signIn: async () => {
+      const { session, error } = supabase.auth.signInWithOAuth({
+        provider: "google",
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      setSession(session);
+      setLoading(false);
+    },
+    signOut: async () => {
+      const { error } = await supabase.auth.signOut();
+
+      if (error) {
+        throw error;
+      }
+
+      setSession(null);
+      setLoading(false);
+    },
+  };
+
+  return (
+    <SupabaseContext.Provider value={supabase}>
+      <AuthContext.Provider value={authContextValue}>
+        {children}
+      </AuthContext.Provider>
+    </SupabaseContext.Provider>
+  );
+};
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error("useAuth must be used within a AuthContextProvider");
+  }
+  return context;
+};
+
+export const useSupabase = () => {
+  const context = useContext(SupabaseContext);
+  if (context === undefined) {
+    throw new Error(
+      "useSupabase must be used within a SupabaseContextProvider"
+    );
+  }
+  return context;
+};
