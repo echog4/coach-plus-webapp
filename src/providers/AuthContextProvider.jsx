@@ -30,6 +30,9 @@ export const AuthContextProvider = ({ children, supabase }) => {
     signIn: async () => {
       const { session, error } = supabase.auth.signInWithOAuth({
         provider: "google",
+        options: {
+          redirectTo: window.location.origin,
+        },
       });
 
       if (error) {
@@ -71,9 +74,7 @@ export const useAuth = () => {
 export const useSupabase = () => {
   const context = useContext(SupabaseContext);
   if (context === undefined) {
-    throw new Error(
-      "useSupabase must be used within a SupabaseContextProvider"
-    );
+    throw new Error("useSupabase must be used within a AuthContextProvider");
   }
   return context;
 };
