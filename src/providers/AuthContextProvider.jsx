@@ -7,8 +7,10 @@ export const AuthContextProvider = ({ children, supabase }) => {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  window.sb = supabase;
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log("session", session);
       setSession(session);
       setLoading(false);
     });
@@ -28,17 +30,20 @@ export const AuthContextProvider = ({ children, supabase }) => {
     user: session && session.user,
     loading: loading,
     signIn: async () => {
-      const { session, error } = supabase.auth.signInWithOAuth({
+      const { session, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
           redirectTo: window.location.origin,
+          queryParams: {
+            access_type: "offline",
+            prompt: "consent",
+          },
         },
       });
 
       if (error) {
         throw error;
       }
-
       setSession(session);
       setLoading(false);
     },

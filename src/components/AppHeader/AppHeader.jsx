@@ -5,6 +5,7 @@ import Typography from "@mui/material/Typography";
 import { Menu as MenuIcon, SportsGymnastics } from "@mui/icons-material";
 import { Avatar, IconButton, Menu, MenuItem } from "@mui/material";
 import { useAuth } from "../../providers/AuthContextProvider";
+import { NotificationArea } from "../NotificationArea/NotificationArea";
 
 const UserMenu = ({ user, signOut, anchorEl, handleOpen, handleClose }) => (
   <div>
@@ -60,15 +61,17 @@ export const AppHeader = ({ handleDrawerToggle }) => {
       sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
     >
       <Toolbar>
-        <IconButton
-          color="inherit"
-          aria-label="open drawer"
-          edge="start"
-          onClick={handleDrawerToggle}
-          sx={{ mr: 2, display: { md: "none" } }}
-        >
-          <MenuIcon />
-        </IconButton>
+        {session && (
+          <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            edge="start"
+            onClick={handleDrawerToggle}
+            sx={{ mr: 2, display: { md: "none" } }}
+          >
+            <MenuIcon />
+          </IconButton>
+        )}
         <IconButton
           size="large"
           edge="start"
@@ -82,13 +85,16 @@ export const AppHeader = ({ handleDrawerToggle }) => {
           Hey Coach
         </Typography>
         {session && (
-          <UserMenu
-            user={user}
-            signOut={signOut}
-            anchorEl={anchorEl}
-            handleOpen={handleOpen}
-            handleClose={handleClose}
-          />
+          <>
+            <NotificationArea />
+            <UserMenu
+              user={user}
+              signOut={signOut}
+              anchorEl={anchorEl}
+              handleOpen={handleOpen}
+              handleClose={handleClose}
+            />
+          </>
         )}
       </Toolbar>
     </AppBar>
