@@ -4,6 +4,8 @@ import { BrowserRouter } from "react-router-dom";
 import { AuthContextProvider } from "../../providers/AuthContextProvider";
 import { createClient } from "@supabase/supabase-js";
 import { useState } from "react";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFnsV3";
 
 export const Providers = ({ children }) => {
   const [supabase] = useState(() =>
@@ -14,13 +16,15 @@ export const Providers = ({ children }) => {
   );
 
   return (
-    <AuthContextProvider supabase={supabase}>
-      <BrowserRouter future={{ v7_startTransition: true }}>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          {children}
-        </ThemeProvider>
-      </BrowserRouter>
-    </AuthContextProvider>
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <AuthContextProvider supabase={supabase}>
+        <BrowserRouter future={{ v7_startTransition: true }}>
+          <ThemeProvider theme={theme}>
+            <CssBaseline />
+            {children}
+          </ThemeProvider>
+        </BrowserRouter>
+      </AuthContextProvider>
+    </LocalizationProvider>
   );
 };

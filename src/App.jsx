@@ -13,6 +13,7 @@ import { DashboardRoute } from "./routes/Dashboard/Dashboard.route";
 import { LoginRoute } from "./routes/Login/Login.route";
 import { ProtectedRoute } from "./components/ProtectedRoute/ProtectedRoute";
 import { CalendarRoute } from "./routes/Calendar/Calendar.route";
+import { CoachOnboardingRoute } from "./routes/CoachOnboarding/CoachOnboarding.route";
 
 function App() {
   const [drawerOpen, setDrawerOpen] = React.useState(false);
@@ -70,6 +71,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <CalendarRoute />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/coach-onboarding"
+              element={
+                <ProtectedRoute>
+                  <CoachOnboardingRoute />
                 </ProtectedRoute>
               }
             />
