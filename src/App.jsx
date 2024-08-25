@@ -14,6 +14,8 @@ import { LoginRoute } from "./routes/Login/Login.route";
 import { ProtectedRoute } from "./components/ProtectedRoute/ProtectedRoute";
 import { CalendarRoute } from "./routes/Calendar/Calendar.route";
 import { CoachOnboardingRoute } from "./routes/CoachOnboarding/CoachOnboarding.route";
+import { PageContainer } from "./components/PageContainer/PageContainer";
+import { OnboardingFormsRoute } from "./routes/OnboardingForms/OnboardingForms.route";
 
 function App() {
   const [drawerOpen, setDrawerOpen] = React.useState(false);
@@ -82,10 +84,22 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/onboarding-forms"
+              element={
+                <ProtectedRoute>
+                  <OnboardingFormsRoute />
+                </ProtectedRoute>
+              }
+            />
             <Route path="/login" element={<LoginRoute />} />
             <Route
               path="*"
-              element={<ProtectedRoute>Not Found</ProtectedRoute>}
+              element={
+                <ProtectedRoute>
+                  <PageContainer>Not Found</PageContainer>
+                </ProtectedRoute>
+              }
             />
           </Routes>
         </div>
