@@ -82,7 +82,7 @@ export const AppHeader = ({ handleDrawerToggle }) => {
           <SportsGymnastics />
         </IconButton>
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-          Hey Coach
+          Coach+
         </Typography>
         {session && (
           <>
