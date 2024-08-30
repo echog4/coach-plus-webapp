@@ -6,6 +6,7 @@ import { createClient } from "@supabase/supabase-js";
 import { useState } from "react";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFnsV3";
+import { CalendarProvider } from "../../providers/CalendarProvider";
 
 export const Providers = ({ children }) => {
   const [supabase] = useState(() =>
@@ -18,12 +19,14 @@ export const Providers = ({ children }) => {
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <AuthContextProvider supabase={supabase}>
-        <BrowserRouter future={{ v7_startTransition: true }}>
-          <ThemeProvider theme={theme}>
-            <CssBaseline />
-            {children}
-          </ThemeProvider>
-        </BrowserRouter>
+        <CalendarProvider>
+          <BrowserRouter future={{ v7_startTransition: true }}>
+            <ThemeProvider theme={theme}>
+              <CssBaseline />
+              {children}
+            </ThemeProvider>
+          </BrowserRouter>
+        </CalendarProvider>
       </AuthContextProvider>
     </LocalizationProvider>
   );

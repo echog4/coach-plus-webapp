@@ -1,9 +1,11 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import { useLocalStorage } from "@uidotdev/usehooks";
 
 const AuthContext = createContext(undefined);
 const SupabaseContext = createContext(undefined);
 
 export const AuthContextProvider = ({ children, supabase }) => {
+  const [localSession, setLocalSession] = useLocalStorage("localSession", null);
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -12,6 +14,7 @@ export const AuthContextProvider = ({ children, supabase }) => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       console.log("session", session);
       setSession(session);
+      setLocalSession(session);
       setLoading(false);
     });
 
@@ -19,14 +22,16 @@ export const AuthContextProvider = ({ children, supabase }) => {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
+      setLocalSession(session);
       setLoading(false);
     });
 
     return () => subscription.unsubscribe();
-  }, [supabase.auth]);
+  }, [supabase.auth, setLocalSession]);
 
   const authContextValue = {
     session,
+    localSession,
     user: session && session.user,
     loading: loading,
     signIn: async () => {
@@ -37,6 +42,7 @@ export const AuthContextProvider = ({ children, supabase }) => {
           queryParams: {
             access_type: "offline",
             prompt: "consent",
+            scope: "email profile https://www.googleapis.com/auth/calendar",
           },
         },
       });
@@ -45,6 +51,7 @@ export const AuthContextProvider = ({ children, supabase }) => {
         throw error;
       }
       setSession(session);
+      setLocalSession(session);
       setLoading(false);
     },
     signOut: async () => {
@@ -55,6 +62,7 @@ export const AuthContextProvider = ({ children, supabase }) => {
       }
 
       setSession(null);
+      setLocalSession(null);
       setLoading(false);
     },
   };
