@@ -28,6 +28,7 @@ export const CalendarProvider = ({ children }) => {
         refresh_token: localSession.provider_refresh_token,
       });
       setGapiInited(true);
+      // await calendarContextValue.getEvents();
       console.log({ localSession });
     };
     window.gapi.load("client", initializeGapiClient);
@@ -39,7 +40,6 @@ export const CalendarProvider = ({ children }) => {
     events,
     calendars,
     gapiInited,
-
     getCalendars: async () => {
       const response = await gapi.client.calendar.calendarList.list();
       console.log({ response });
@@ -57,6 +57,31 @@ export const CalendarProvider = ({ children }) => {
       const response = await gapi.client.calendar.events.list(request);
       console.log({ response });
       setEvents(response.result.items);
+    },
+    createEvent: async (calendarId, event) => {
+      await window.gapi.client.setToken({
+        access_token: localSession.provider_token,
+        refresh_token: localSession.provider_refresh_token,
+      });
+      const request = {
+        calendarId: calendarId,
+        resource: event,
+      };
+      const response = await gapi.client.calendar.events.insert(request);
+      console.log({ response });
+      setEvents([...events, response.result.items]);
+    },
+    deleteEvent: async (calendarId, eventId) => {
+      await window.gapi.client.setToken({
+        access_token: localSession.provider_token,
+        refresh_token: localSession.provider_refresh_token,
+      });
+      const request = {
+        calendarId: calendarId,
+        eventId: eventId,
+      };
+      const response = await gapi.client.calendar.events.delete(request);
+      console.log({ response });
     },
   };
 

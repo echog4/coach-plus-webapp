@@ -47,7 +47,7 @@ const forms = [
 
 export const OnboardingFormsRoute = () => {
   const [responsesOpen, setResponseOpen] = useState(false);
-  const [formOpen, setFormOpen] = useState(true);
+  const [formOpen, setFormOpen] = useState(false);
 
   return (
     <>
