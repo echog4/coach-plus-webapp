@@ -11,7 +11,7 @@ import { Link } from "react-router-dom";
 import { sideBarConfig } from "./sideBar.config";
 import { useAuth } from "../../providers/AuthContextProvider";
 
-const drawerWidth = 240;
+export const drawerWidth = 240;
 
 export const SideBar = ({
   drawerOpen,

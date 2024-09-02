@@ -5,7 +5,6 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableContainer,
   TableHead,
   TableRow,
   TextField,
@@ -13,6 +12,7 @@ import {
 } from "@mui/material";
 import { Cancel, CheckCircle, Pool } from "@mui/icons-material";
 import { useState } from "react";
+import { drawerWidth } from "../SideBar/SideBar";
 
 const mockData = [
   {
@@ -347,70 +347,79 @@ export const AthletesTable = ({ pic, name, info }) => {
   const [search, setSearch] = useState("");
 
   return (
-    <Paper sx={{ overflow: "hidden", height: 520 }} variant="outlined">
-      <Paper sx={{ width: "100%", overflow: "hidden" }}>
-        <Box p={2} display="flex" alignItems="center" height="80px">
-          <Pool style={{ marginRight: 12 }} />
-          <Typography variant="h6" fontWeight="900">
-            Your Athletes
-          </Typography>
-          <TextField
-            id="standard-search"
-            label="Search for athlete..."
-            type="search"
-            variant="standard"
-            style={{ marginLeft: "auto", width: 240 }}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </Box>
-        <TableContainer sx={{ maxHeight: 440 }}>
-          <Table stickyHeader aria-label="sticky table">
-            <TableHead>
-              <TableRow>
-                {cols.map((column, i) => (
-                  <TableCell
-                    key={i}
-                    align={column.align}
-                    style={{ minWidth: column.minWidth }}
-                  >
-                    {column.label}
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {mockData
-                .filter((row) =>
-                  row.athlete.name.toLowerCase().includes(search.toLowerCase())
-                )
-                .map((row, i) => {
-                  return (
-                    <TableRow hover role="checkbox" tabIndex={-1} key={i}>
-                      {cols.map((column, i) => {
-                        const value = row[column.id];
-                        return (
-                          <TableCell key={i} align={column.align}>
-                            {column.format ? column.format(value) : value}
-                          </TableCell>
-                        );
-                      })}
-                    </TableRow>
-                  );
-                })}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        {/* <TablePagination
-        rowsPerPageOptions={[10, 25, 100]}
-        component="div"
-        count={rows.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-      /> */}
-      </Paper>
+    <Paper
+      sx={{
+        overflow: "auto",
+        mb: 4,
+        width: {
+          xs: "calc(100vw - 48px)",
+          sm: "calc(100vw - 48px)",
+          md: `calc(100vw - ${drawerWidth + 48}px)`,
+        },
+      }}
+    >
+      <Box
+        p={2}
+        display="flex"
+        alignItems="center"
+        height="80px"
+        sx={{
+          width: {
+            xs: "calc(100vw - 48px)",
+            sm: "calc(100vw - 48px)",
+            md: `calc(100vw - ${drawerWidth + 48}px)`,
+          },
+        }}
+      >
+        <Pool style={{ marginRight: 12 }} />
+        <Typography variant="h6" fontWeight="900">
+          Your Athletes
+        </Typography>
+        <TextField
+          id="standard-search"
+          label="Search for athlete..."
+          type="search"
+          variant="standard"
+          style={{ marginLeft: "auto", width: 240 }}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+      </Box>
+      <Table stickyHeader aria-label="sticky table">
+        <TableHead>
+          <TableRow>
+            {cols.map((column, i) => (
+              <TableCell
+                key={i}
+                align={column.align}
+                style={{ minWidth: column.minWidth }}
+              >
+                {column.label}
+              </TableCell>
+            ))}
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {mockData
+            .filter((row) =>
+              row.athlete.name.toLowerCase().includes(search.toLowerCase())
+            )
+            .map((row, i) => {
+              return (
+                <TableRow hover role="checkbox" tabIndex={-1} key={i}>
+                  {cols.map((column, i) => {
+                    const value = row[column.id];
+                    return (
+                      <TableCell key={i} align={column.align}>
+                        {column.format ? column.format(value) : value}
+                      </TableCell>
+                    );
+                  })}
+                </TableRow>
+              );
+            })}
+        </TableBody>
+      </Table>
     </Paper>
   );
 };

@@ -7,11 +7,10 @@ const gapi = window.gapi;
 
 export const CalendarProvider = ({ children }) => {
   const [gapiInited, setGapiInited] = useState(false);
-  const [gisInited, setGisInited] = useState(false);
-  const [tokenClient, setTokenClient] = useState(null);
   const [events, setEvents] = useState([]);
+  const [calendars, setCalendars] = useState([]);
 
-  const { localSession, user, signOut } = useAuth();
+  const { localSession } = useAuth();
 
   useEffect(() => {
     const initializeGapiClient = async () => {
@@ -32,11 +31,20 @@ export const CalendarProvider = ({ children }) => {
       console.log({ localSession });
     };
     window.gapi.load("client", initializeGapiClient);
-  }, [localSession]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [localSession, window.gapi]);
 
   const calendarContextValue = {
     gapi,
     events,
+    calendars,
+    gapiInited,
+
+    getCalendars: async () => {
+      const response = await gapi.client.calendar.calendarList.list();
+      console.log({ response });
+      setCalendars(response.result.items);
+    },
     getEvents: async () => {
       const request = {
         calendarId: "primary",
@@ -48,6 +56,7 @@ export const CalendarProvider = ({ children }) => {
       };
       const response = await gapi.client.calendar.events.list(request);
       console.log({ response });
+      setEvents(response.result.items);
     },
   };
 
