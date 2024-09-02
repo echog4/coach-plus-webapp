@@ -18,20 +18,20 @@ export const CalendarProvider = ({ children }) => {
       if (!localSession) {
         return;
       }
-      await gapi.client.init({
+      await window.gapi.client.init({
         apiKey: process.env.REACT_APP_GOOGLE_API_KEY,
         discoveryDocs: [
           "https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest",
         ],
       });
-      await gapi.client.setToken({
+      await window.gapi.client.setToken({
         access_token: localSession.provider_token,
         refresh_token: localSession.provider_refresh_token,
       });
       setGapiInited(true);
       console.log({ localSession });
     };
-    gapi.load("client", initializeGapiClient);
+    window.gapi.load("client", initializeGapiClient);
   }, [localSession]);
 
   const calendarContextValue = {
