@@ -23,13 +23,13 @@ export const CalendarProvider = ({ children }) => {
           "https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest",
         ],
       });
+      // TODO: disable this line. should be handled by gis
       await window.gapi.client.setToken({
         access_token: localSession.provider_token,
         refresh_token: localSession.provider_refresh_token,
       });
       setGapiInited(true);
       // await calendarContextValue.getEvents();
-      console.log({ localSession });
     };
     window.gapi.load("client", initializeGapiClient);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -45,13 +45,20 @@ export const CalendarProvider = ({ children }) => {
       console.log({ response });
       setCalendars(response.result.items);
     },
+    createCalendar: async (calendar) => {
+      const request = {
+        resource: calendar,
+      };
+      const response = await gapi.client.calendar.calendars.insert(request);
+      console.log({ response });
+      setCalendars([...calendars, response.result]);
+    },
     getEvents: async () => {
       const request = {
         calendarId: "primary",
         timeMin: "2024-07-30T11:39:30.328Z",
         showDeleted: false,
         singleEvents: true,
-        maxResults: 10,
         orderBy: "startTime",
       };
       const response = await gapi.client.calendar.events.list(request);
@@ -59,10 +66,6 @@ export const CalendarProvider = ({ children }) => {
       setEvents(response.result.items);
     },
     createEvent: async (calendarId, event) => {
-      await window.gapi.client.setToken({
-        access_token: localSession.provider_token,
-        refresh_token: localSession.provider_refresh_token,
-      });
       const request = {
         calendarId: calendarId,
         resource: event,
@@ -72,10 +75,6 @@ export const CalendarProvider = ({ children }) => {
       setEvents([...events, response.result.items]);
     },
     deleteEvent: async (calendarId, eventId) => {
-      await window.gapi.client.setToken({
-        access_token: localSession.provider_token,
-        refresh_token: localSession.provider_refresh_token,
-      });
       const request = {
         calendarId: calendarId,
         eventId: eventId,

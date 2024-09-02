@@ -1,13 +1,21 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useLocalStorage } from "@uidotdev/usehooks";
+import { G_SCOPE, LSN_SESSION_KEY } from "../utils/constant";
 
 const AuthContext = createContext(undefined);
 const SupabaseContext = createContext(undefined);
 
+const google = window.google;
+
 export const AuthContextProvider = ({ children, supabase }) => {
-  const [localSession, setLocalSession] = useLocalStorage("localSession", null);
+  const [localSession, setLocalSession] = useLocalStorage(
+    LSN_SESSION_KEY,
+    null
+  );
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [tokenClient, setTokenClient] = useState(null);
+  const [googleToken, setGoogleToken] = useState(null);
 
   window.sb = supabase;
   useEffect(() => {
@@ -29,10 +37,34 @@ export const AuthContextProvider = ({ children, supabase }) => {
     return () => subscription.unsubscribe();
   }, [supabase.auth, setLocalSession]);
 
-  const authContextValue = {
+  useEffect(() => {
+    setTokenClient(
+      google.accounts.oauth2.initTokenClient({
+        client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID,
+        scope: G_SCOPE,
+        prompt: "",
+        callback: (token) => {
+          setLocalSession({
+            ...localSession,
+            provider_token: token.access_token,
+          });
+
+          setGoogleToken({
+            ...token,
+            expires_at: Date.now() + token.expires_in * 1000,
+          });
+        },
+      })
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  window.authContextValue = {
     session,
     localSession,
     user: session && session.user,
+    tokenClient,
+    googleToken,
     loading: loading,
     signIn: async () => {
       const { session, error } = await supabase.auth.signInWithOAuth({
@@ -42,7 +74,7 @@ export const AuthContextProvider = ({ children, supabase }) => {
           queryParams: {
             access_type: "offline",
             prompt: "consent",
-            scope: "email profile https://www.googleapis.com/auth/calendar",
+            scope: G_SCOPE,
           },
         },
       });
@@ -53,6 +85,9 @@ export const AuthContextProvider = ({ children, supabase }) => {
       setSession(session);
       setLocalSession(session);
       setLoading(false);
+    },
+    refreshGoogleToken: async () => {
+      tokenClient.requestAccessToken();
     },
     signOut: async () => {
       const { error } = await supabase.auth.signOut();
@@ -69,7 +104,7 @@ export const AuthContextProvider = ({ children, supabase }) => {
 
   return (
     <SupabaseContext.Provider value={supabase}>
-      <AuthContext.Provider value={authContextValue}>
+      <AuthContext.Provider value={window.authContextValue}>
         {children}
       </AuthContext.Provider>
     </SupabaseContext.Provider>

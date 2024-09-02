@@ -2,9 +2,11 @@ import { Box, Button, CircularProgress, Paper } from "@mui/material";
 import { PageContainer } from "../../components/PageContainer/PageContainer";
 import { useCalendar } from "../../providers/CalendarProvider";
 import { useEffect, useState } from "react";
+import { useAuth } from "../../providers/AuthContextProvider";
 
 export const CalendarComponent = () => {
   const { createEvent, deleteEvent, getEvents, events } = useCalendar();
+  const { refreshGoogleToken } = useAuth();
   const [showCal, setShowCal] = useState(true);
 
   const reloadCalendar = () => {
@@ -12,7 +14,7 @@ export const CalendarComponent = () => {
     setTimeout(() => {
       setShowCal(true);
       getEvents();
-    }, 3000);
+    }, 2000);
   };
 
   useEffect(() => {
@@ -22,6 +24,7 @@ export const CalendarComponent = () => {
 
   return (
     <PageContainer>
+      <Button onClick={refreshGoogleToken}>Refresh</Button>
       <Button
         onClick={() => {
           createEvent("primary", {

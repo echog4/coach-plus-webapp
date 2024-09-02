@@ -16,6 +16,7 @@ import { CalendarRoute } from "./routes/Calendar/Calendar.route";
 import { CoachOnboardingRoute } from "./routes/CoachOnboarding/CoachOnboarding.route";
 import { PageContainer } from "./components/PageContainer/PageContainer";
 import { OnboardingFormsRoute } from "./routes/OnboardingForms/OnboardingForms.route";
+import { OnboardingFormDisplayRoute } from "./routes/OnboardingFormDisplay/OnboardingFormDisplay.route";
 
 function App() {
   const [drawerOpen, setDrawerOpen] = React.useState(false);
@@ -91,6 +92,10 @@ function App() {
                   <OnboardingFormsRoute />
                 </ProtectedRoute>
               }
+            />
+            <Route
+              path="/onboarding-form/:id"
+              element={<OnboardingFormDisplayRoute />}
             />
             <Route path="/login" element={<LoginRoute />} />
             <Route
