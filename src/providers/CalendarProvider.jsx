@@ -29,7 +29,6 @@ export const CalendarProvider = ({ children }) => {
         refresh_token: localSession.provider_refresh_token,
       });
       setGapiInited(true);
-      // await calendarContextValue.getEvents();
     };
     window.gapi.load("client", initializeGapiClient);
     // eslint-disable-next-line react-hooks/exhaustive-deps

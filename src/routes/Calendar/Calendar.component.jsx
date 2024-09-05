@@ -5,7 +5,6 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle,
   Paper,
   Typography,
@@ -59,8 +58,6 @@ export const CalendarComponent = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const _events = getSelectedEvents();
-
   return (
     <PageContainer>
       {!!selectedEvent && (
@@ -99,7 +96,7 @@ export const CalendarComponent = () => {
         {calendars.length > 0 ? (
           <Calendar
             localizer={localizer}
-            events={_events || []}
+            events={getSelectedEvents() || []}
             startAccessor="start"
             endAccessor="end"
             style={{ height: "calc(100vh - 200px)" }}
@@ -155,11 +152,8 @@ const EventModal = ({ event, onClose, open, onDelete }) => {
       <DialogTitle>{event.title}</DialogTitle>
       <DialogContent>
         <Typography variant="subtitle2">Training Program: </Typography>
-        <DialogContentText>
-          <div
-            dangerouslySetInnerHTML={{ __html: event.resource.description }}
-          />
-        </DialogContentText>
+
+        <div dangerouslySetInnerHTML={{ __html: event.resource.description }} />
       </DialogContent>
       <DialogActions>
         <Button
