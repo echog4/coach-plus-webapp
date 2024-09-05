@@ -43,6 +43,7 @@ export const CalendarComponent = () => {
     getSelectedEvents,
     deleteEvent,
     calendars,
+    gapiInited,
   } = useCalendar();
   const { refreshGoogleToken } = useAuth();
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -52,11 +53,11 @@ export const CalendarComponent = () => {
   };
 
   useEffect(() => {
-    setTimeout(() => {
+    if (gapiInited) {
       reloadCalendar();
-    }, 1000);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [gapiInited]);
 
   return (
     <PageContainer>
