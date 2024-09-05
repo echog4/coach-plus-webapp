@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useAuth } from "./AuthContextProvider";
+import { startOfMonth } from "date-fns";
 
 const CalendarContext = createContext(undefined);
 
@@ -7,7 +8,6 @@ const gapi = window.gapi;
 
 export const CalendarProvider = ({ children }) => {
   const [gapiInited, setGapiInited] = useState(false);
-  const [events, setEvents] = useState([]);
   const [calendars, setCalendars] = useState([]);
 
   const { localSession } = useAuth();
@@ -35,44 +35,99 @@ export const CalendarProvider = ({ children }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [localSession, window.gapi]);
 
-  const calendarContextValue = {
+  window.calendarContextValue = {
     gapi,
-    events,
     calendars,
     gapiInited,
+    toggleCalendar: (calendarId) => {
+      setCalendars(
+        calendars.map((calendar) =>
+          calendar.calendarId === calendarId
+            ? { ...calendar, hidden: !calendar.hidden }
+            : calendar
+        )
+      );
+    },
     getCalendars: async () => {
       const response = await gapi.client.calendar.calendarList.list();
-      console.log({ response });
-      setCalendars(response.result.items);
+
+      const cals = await Promise.all(
+        response.result.items.map(async (calendar) => {
+          const savedCalendar = calendars.find(
+            (c) => c.calendarId === calendar.id
+          );
+
+          return {
+            calendarId: calendar.id,
+            color: calendar.backgroundColor,
+            textColor: calendar.foregroundColor,
+            title: calendar.summary,
+            events:
+              savedCalendar && savedCalendar.hidden
+                ? []
+                : (
+                    await window.calendarContextValue.getEvents(calendar.id)
+                  ).map((event) => ({
+                    ...event,
+                    calendarId: calendar.id,
+                    backgroundColor: calendar.backgroundColor,
+                    foregroundColor: calendar.foregroundColor,
+                  })),
+            hidden: savedCalendar ? savedCalendar.hidden : false,
+          };
+        })
+      );
+
+      setCalendars(cals);
+    },
+    syncCalendarsLocalStorage: (cals) => {},
+    getSelectedCalendars: () => {
+      return calendars.filter((calendar) => !calendar.hidden);
+    },
+    getSelectedEvents: () => {
+      return window.calendarContextValue
+        .getSelectedCalendars()
+        .map((calendar) => calendar.events)
+        .flat()
+        .map((event) => ({
+          ...event,
+          start: new Date(event.start),
+          end: new Date(event.end),
+        }));
     },
     createCalendar: async (calendar) => {
       const request = {
         resource: calendar,
       };
       const response = await gapi.client.calendar.calendars.insert(request);
-      console.log({ response });
       setCalendars([...calendars, response.result]);
     },
-    getEvents: async () => {
+    getEvents: async (calId, startTime) => {
+      const st = startTime || startOfMonth(new Date());
+
       const request = {
-        calendarId: "primary",
-        timeMin: "2024-07-30T11:39:30.328Z",
+        calendarId: calId || "primary",
+        timeMin: st.toISOString(),
         showDeleted: false,
         singleEvents: true,
+        maxResults: 1000,
         orderBy: "startTime",
       };
       const response = await gapi.client.calendar.events.list(request);
-      console.log({ response });
-      setEvents(response.result.items);
+      return response.result.items.map((item) => ({
+        resource: item,
+        start: new Date(item.start.dateTime),
+        end: new Date(item.end.dateTime),
+        title: item.summary,
+      }));
     },
     createEvent: async (calendarId, event) => {
       const request = {
         calendarId: calendarId,
         resource: event,
       };
-      const response = await gapi.client.calendar.events.insert(request);
-      console.log({ response });
-      setEvents([...events, response.result.items]);
+      await gapi.client.calendar.events.insert(request);
+      await window.calendarContextValue.getEvents(calendarId);
     },
     deleteEvent: async (calendarId, eventId) => {
       const request = {
@@ -85,7 +140,7 @@ export const CalendarProvider = ({ children }) => {
   };
 
   return (
-    <CalendarContext.Provider value={calendarContextValue}>
+    <CalendarContext.Provider value={window.calendarContextValue}>
       {children}
     </CalendarContext.Provider>
   );
