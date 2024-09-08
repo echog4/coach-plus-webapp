@@ -121,8 +121,8 @@ export const TrainingPlanRoute = () => {
           value={tpSearch}
           onChange={(e) => setTpSearch(e.target.value)}
         />
-        <Box>
-          <Grid2 container spacing={2} sx={{ mb: 1 }}>
+        <Box sx={{ mb: 2 }}>
+          <Grid2 container spacing={2} sx={{ mb: 2 }}>
             {trainingPlansMock
               .slice(0, tpLoadMore ? trainingPlansMock.length : 3)
               .filter((tp) =>
