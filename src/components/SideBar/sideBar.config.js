@@ -1,6 +1,7 @@
 import {
   Article,
   CalendarMonth,
+  Checklist,
   Dashboard,
   ManageAccounts,
   Pool,
@@ -16,6 +17,11 @@ export const sideBarConfig = [
     name: "Athletes",
     path: "/athletes",
     icon: <Pool />,
+  },
+  {
+    name: "Training Plans",
+    path: "/training-plan",
+    icon: <Checklist />,
   },
   {
     name: "Onboarding Forms",

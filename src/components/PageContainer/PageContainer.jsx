@@ -11,6 +11,12 @@ export const PageContainer = ({ children, ...props }) => (
         md: 3,
         lg: 4,
       },
+      pt: {
+        xs: 3,
+        sm: 3,
+        md: 4,
+        lg: 4,
+      },
     }}
   >
     <Toolbar />
