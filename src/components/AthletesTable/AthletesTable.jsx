@@ -13,91 +13,90 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { PersonAdd, Pool, Warning } from "@mui/icons-material";
-import { useState } from "react";
+import { Info, PersonAdd, Pool, Warning } from "@mui/icons-material";
+import { useEffect, useState } from "react";
 import AthleteInviteModal from "../AthleteInvitationModal/AthleteInvitationModal";
+import { useAuth, useSupabase } from "../../providers/AuthContextProvider";
 
-const mockData = [
-  {
-    athlete: {
-      id: 1,
-      pic: "/static/images/avatar/1.jpg",
-      name: "Ali Connors",
-    },
-    info: <Chip label="2 days" color="info" />,
-  },
-  {
-    athlete: {
-      id: 2,
-      pic: "/static/images/avatar/2.jpg",
-      name: "Travis Howard",
-    },
-    info: (
-      <Chip
-        label="No schedule"
-        color="warning"
-        icon={<Warning color="warning" sx={{ height: 18 }} />}
-      />
-    ),
-  },
-  {
-    athlete: {
-      id: 3,
-      pic: "/static/images/avatar/3.jpg",
-      name: "Sandra Adams",
-    },
-    info: <Chip label="4 days" color="info" />,
-  },
-  {
-    athlete: {
-      id: 4,
-      pic: "/static/images/avatar/1.jpg",
-      name: "Ali Connors",
-    },
-    info: <Chip label="2 days" color="info" />,
-  },
-  {
-    athlete: {
-      id: 5,
-      pic: "/static/images/avatar/2.jpg",
-      name: "Travis Howard",
-    },
-    info: <Chip label="2 days" color="info" />,
-  },
-  {
-    athlete: {
-      id: 6,
-      pic: "/static/images/avatar/3.jpg",
-      name: "Sandra Adams",
-    },
-    info: <Chip label="2 days" color="info" />,
-  },
-];
+export const searchInObjects = (searchTerm, objectsArray) => {
+  // Convert the search term to lowercase for case-insensitive search
+  const lowerSearchTerm = searchTerm.toLowerCase();
+
+  // Filter the array of objects based on whether the search term is found in any string value
+  return objectsArray.filter((obj) => {
+    return Object.keys(obj.athletes).some((key) => {
+      const value = obj.athletes[key];
+
+      // Check if the value is a string, and if the search term is a substring of it
+      return (
+        typeof value === "string" &&
+        value.toLowerCase().includes(lowerSearchTerm)
+      );
+    });
+  });
+};
 
 const cols = [
   {
-    id: "athlete",
+    id: "athletes",
     label: "Athlete",
-    format: ({ pic, name }) => (
-      <Box display="flex" alignItems="center">
-        <Avatar
-          alt={name}
-          src={pic}
-          style={{ width: 30, height: 30, marginRight: 16 }}
-        />
-        <span>{name}</span>
-      </Box>
-    ),
+    format: (athlete) => {
+      const name = athlete.first_name
+        ? `${athlete.first_name} ${athlete.last_name}`
+        : athlete.full_name
+        ? athlete.full_name
+        : athlete.email;
+      return (
+        <Box display="flex" alignItems="center">
+          <Avatar
+            alt={name}
+            src={name}
+            style={{ width: 30, height: 30, marginRight: 16 }}
+          />
+          <span>{name}</span>
+        </Box>
+      );
+    },
   },
   {
-    id: "info",
-    label: "Next Event",
+    id: "athletes",
+    label: "Status",
+    format: (athlete) => {
+      return athlete.status === "PENDING" ? (
+        <Chip
+          size="small"
+          color="info"
+          label="Pending Onboarding"
+          icon={<Info />}
+        />
+      ) : (
+        <Chip size="small" color="success" label="Onboarded" />
+      );
+    },
   },
 ];
 
 export const AthletesTable = ({ pic, name, info }) => {
   const [search, setSearch] = useState("");
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
+  const [athletes, setAthletes] = useState([]);
+  const supabase = useSupabase();
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (!user) {
+      return;
+    }
+    supabase
+      .from("coach_athletes")
+      .select("*, athletes(*, onboarding_form_response(*))")
+      .eq("coach_id", user.id)
+      .is("deleted_at", null)
+      .then(({ data }) => {
+        setAthletes(data || []);
+      });
+    //  eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   return (
     <Paper variant="outlined" sx={{ overflow: "hidden" }}>
@@ -122,7 +121,7 @@ export const AthletesTable = ({ pic, name, info }) => {
           label="Search for athlete..."
           type="search"
           variant="standard"
-          style={{ marginLeft: "auto", width: 240 }}
+          fullWidth
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -143,24 +142,27 @@ export const AthletesTable = ({ pic, name, info }) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {mockData
-              .filter((row) =>
-                row.athlete.name.toLowerCase().includes(search.toLowerCase())
-              )
-              .map((row, i) => {
-                return (
-                  <TableRow hover role="checkbox" tabIndex={-1} key={i}>
-                    {cols.map((column, i) => {
-                      const value = row[column.id];
-                      return (
-                        <TableCell key={i} align={column.align}>
-                          {column.format ? column.format(value) : value}
-                        </TableCell>
-                      );
-                    })}
-                  </TableRow>
-                );
-              })}
+            {searchInObjects(search, athletes).map((row, i) => {
+              return (
+                <TableRow
+                  hover
+                  role="checkbox"
+                  tabIndex={-1}
+                  key={i}
+                  onClick={(event) => console.log(event, row.id)}
+                  sx={{ cursor: "pointer" }}
+                >
+                  {cols.map((column, i) => {
+                    const value = row[column.id];
+                    return (
+                      <TableCell key={i} align={column.align}>
+                        {column.format ? column.format(value) : value}
+                      </TableCell>
+                    );
+                  })}
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </TableContainer>
