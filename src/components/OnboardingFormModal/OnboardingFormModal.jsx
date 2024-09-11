@@ -11,17 +11,31 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import EmojiPicker from "emoji-picker-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { sportsEmojis } from "../../routes/OnboardingForms/constants";
+import { useAuth, useSupabase } from "../../providers/AuthContextProvider";
 
 export default function OnboardingFormModal({
   open,
   handleClose,
-  formData = {},
+  onSuccess,
+  formData,
 }) {
-  const [newFields, setNewFields] = useState(formData.fields || []);
-  const [formName, setFormName] = useState(formData.name || "");
-  const [emoji, setEmoji] = useState(formData.emoji || "");
+  const [loading, setLoading] = useState(false);
+  const [newFields, setNewFields] = useState([]);
+  const [formName, setFormName] = useState("");
+  const [welcomeMessage, setWelcomeMessage] = useState("");
+  const [emoji, setEmoji] = useState(sportsEmojis[0]);
+
+  useEffect(() => {
+    setNewFields(formData.custom_questions || []);
+    setFormName(formData.title || "");
+    setWelcomeMessage(formData.welcome_message || "");
+    setEmoji(formData.icon || sportsEmojis[0]);
+  }, [formData]);
+
+  const { user } = useAuth();
+  const supabase = useSupabase();
 
   const addField = () => {
     setNewFields([...newFields, { name: "", type: "text" }]);
@@ -38,27 +52,11 @@ export default function OnboardingFormModal({
   };
 
   return (
-    <Dialog
-      open={open}
-      onClose={handleClose}
-      fullWidth
-      keepMounted={false}
-      PaperProps={{
-        component: "form",
-        onSubmit: (event) => {
-          event.preventDefault();
-          const formData = new FormData(event.currentTarget);
-          const formJson = Object.fromEntries(formData.entries());
-          const email = formJson.email;
-          console.log(email);
-          handleClose();
-        },
-      }}
-    >
+    <Dialog open={open} onClose={handleClose} fullWidth keepMounted={false}>
       <DialogTitle>
-        {!formData.fields
+        {!formData.title
           ? "Create a new onboarding form"
-          : `Edit "${formData.name}"`}
+          : `Edit "${formData.title}"`}
       </DialogTitle>
       <DialogContent>
         <DialogContentText sx={{ mb: 2 }}>
@@ -67,22 +65,46 @@ export default function OnboardingFormModal({
         </DialogContentText>
         <Box sx={{ mb: 3 }}>
           <TextField
+            label="Form Name"
             placeholder="Give Your Form a Name"
             fullWidth
-            variant="standard"
             value={formName}
             onChange={(e) => setFormName(e.target.value)}
           />
         </Box>
-        <Box display="flex" flexWrap="wrap" sx={{ mb: 3 }}>
-          <Typography variant="subtitle2" sx={{ mb: 2, mr: 2 }}>
-            Pick an emoji: <span style={{ fontSize: 28 }}>{emoji.emoji}</span>
-          </Typography>
-          <EmojiPicker
-            onEmojiClick={setEmoji}
-            height={350}
-            previewConfig={{ showPreview: false }}
+        <Box sx={{ mb: 3 }}>
+          <TextField
+            label="Welcome Message"
+            placeholder="Type in a welcome message for your athletes"
+            fullWidth
+            value={welcomeMessage}
+            multiline
+            minRows={3}
+            onChange={(e) => setWelcomeMessage(e.target.value)}
           />
+        </Box>
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="subtitle2" sx={{ mb: 2, mr: 2, flexGrow: 1 }}>
+            Pick an emoji: <span style={{ fontSize: 20 }}>{emoji}</span>
+          </Typography>
+          <Box flexGrow={0}>
+            {sportsEmojis.map((sport, index) => (
+              <Button
+                key={index}
+                sx={{
+                  width: 40,
+                  minWidth: 40,
+                  height: 40,
+                  fontSize: 20,
+                  p: 0,
+                }}
+                variant={emoji === sport ? "outlined" : "text"}
+                onClick={() => setEmoji(sport)}
+              >
+                {sport}
+              </Button>
+            ))}
+          </Box>
         </Box>
         {newFields.length > 0 && (
           <Typography variant="subtitle2" sx={{ mb: 0 }}>
@@ -108,8 +130,30 @@ export default function OnboardingFormModal({
         <Button onClick={addField} sx={{ mr: "auto" }}>
           Add new Question
         </Button>
-        <Button onClick={() => console.log(newFields)}>
-          {!formData.fields ? "Create" : "Update"}
+        <Button
+          disabled={loading}
+          onClick={async () => {
+            setLoading(true);
+
+            const id = formData.id ? { id: formData.id } : {};
+            const payload = {
+              ...id,
+              user_id: user.id,
+              custom_questions: newFields,
+              title: formName,
+              welcome_message: welcomeMessage,
+              icon: emoji,
+            };
+            console.log(payload);
+            const { data } = await supabase
+              .from("onboarding_forms")
+              .upsert(payload)
+              .select();
+            setLoading(false);
+            onSuccess(data[0]);
+          }}
+        >
+          {!formData.title ? "Create" : "Update"}
         </Button>
         <Button onClick={handleClose}>Close</Button>
       </DialogActions>

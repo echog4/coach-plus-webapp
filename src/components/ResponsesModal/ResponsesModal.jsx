@@ -4,17 +4,9 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import {
-  Avatar,
-  Box,
-  List,
-  ListItemAvatar,
-  ListItemButton,
-  ListItemText,
-  Typography,
-} from "@mui/material";
+import { Avatar, Box, List, ListItemButton, Typography } from "@mui/material";
 
-export default function ResponsesModal({ open, handleClose }) {
+export default function ResponsesModal({ open, handleClose, formData }) {
   return (
     <Dialog open={open} onClose={handleClose} fullWidth>
       <DialogTitle>
@@ -26,62 +18,37 @@ export default function ResponsesModal({ open, handleClose }) {
               mr: 2,
             }}
           >
-            👵🏻
+            {formData.icon}
           </Avatar>
-          <Typography variant="subtitle2">Old people training</Typography>
+          <Typography variant="subtitle2">{formData.title}</Typography>
         </Box>
       </DialogTitle>
       <DialogContent>
-        <DialogContentText>
-          This form has been sent to <strong>5</strong> people and{" "}
-          <strong>2</strong> have responded.
-        </DialogContentText>
+        {formData.onboarding_form_response?.length > 0 ? (
+          <DialogContentText>
+            This form has been sent to{" "}
+            <strong>formData.onboarding_form_response?.length</strong> people
+            and{" "}
+            <strong>
+              {
+                formData.onboarding_form_response.filter(
+                  (r) => r.status === "completed"
+                ).length
+              }
+            </strong>{" "}
+            have responded.
+          </DialogContentText>
+        ) : (
+          <DialogContentText>No responses yet</DialogContentText>
+        )}
         <List sx={{ width: "100%" }}>
-          <ListItemButton>
-            <ListItemAvatar>
-              <Avatar
-                alt="Remy Sharp"
-                src="https://mui.com/static/images/avatar/1.jpg"
-              />
-            </ListItemAvatar>
-            <ListItemText primary="Remy Sharp" secondary="Completed" />
-          </ListItemButton>
-          <ListItemButton>
-            <ListItemAvatar>
-              <Avatar
-                alt="Remy Sharp"
-                src="https://mui.com/static/images/avatar/1.jpg"
-              />
-            </ListItemAvatar>
-            <ListItemText primary="Remy Sharp" secondary="Completed" />
-          </ListItemButton>
-          <ListItemButton>
-            <ListItemAvatar>
-              <Avatar
-                alt="Remy Sharp"
-                src="https://mui.com/static/images/avatar/1.jpg"
-              />
-            </ListItemAvatar>
-            <ListItemText primary="Remy Sharp" secondary="In Progress" />
-          </ListItemButton>
-          <ListItemButton>
-            <ListItemAvatar>
-              <Avatar
-                alt="Remy Sharp"
-                src="https://mui.com/static/images/avatar/1.jpg"
-              />
-            </ListItemAvatar>
-            <ListItemText primary="Remy Sharp" secondary="In Progress" />
-          </ListItemButton>
-          <ListItemButton>
-            <ListItemAvatar>
-              <Avatar
-                alt="Remy Sharp"
-                src="https://mui.com/static/images/avatar/1.jpg"
-              />
-            </ListItemAvatar>
-            <ListItemText primary="Remy Sharp" secondary="In Progress" />
-          </ListItemButton>
+          {formData.onboarding_form_response?.map((r) => (
+            <ListItemButton>
+              <pre>
+                <code>{JSON.stringify(r, null, 2)}</code>
+              </pre>
+            </ListItemButton>
+          ))}
         </List>
       </DialogContent>
       <DialogActions>
