@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useAuth } from "./AuthContextProvider";
-import { startOfMonth } from "date-fns";
+import { endOfDay, startOfDay, startOfMonth } from "date-fns";
 
 const CalendarContext = createContext(undefined);
 
@@ -113,12 +113,20 @@ export const CalendarProvider = ({ children }) => {
         orderBy: "startTime",
       };
       const response = await gapi.client.calendar.events.list(request);
-      return response.result.items.map((item) => ({
-        resource: item,
-        start: new Date(item.start.dateTime),
-        end: new Date(item.end.dateTime),
-        title: item.summary,
-      }));
+      return response.result.items.map((item) => {
+        const isAllDay = item.start.date ? true : false;
+        return {
+          resource: item,
+          allDay: isAllDay,
+          start: isAllDay
+            ? startOfDay(item.start.date)
+            : new Date(item.start.dateTime),
+          end: isAllDay
+            ? endOfDay(item.start.date)
+            : new Date(item.end.dateTime),
+          title: item.summary,
+        };
+      });
     },
     createEvent: async (calendarId, event) => {
       const request = {

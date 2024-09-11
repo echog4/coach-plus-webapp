@@ -13,28 +13,66 @@ export const AuthContextProvider = ({ children, supabase }) => {
     null
   );
   const [session, setSession] = useState(null);
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [tokenClient, setTokenClient] = useState(null);
   const [googleToken, setGoogleToken] = useState(null);
 
+  const _setSession = (session) => {
+    setSession(session);
+    setLocalSession(session);
+    setLoading(false);
+    if (session) {
+      syncUser(session);
+    } else {
+      setUser(null);
+    }
+  };
+
+  const syncUser = async (session) => {
+    const { data: existing_user, error } = await supabase
+      .from("users")
+      .select("*")
+      .eq("id", session.user.id);
+
+    if (error) {
+      console.log(error);
+    }
+
+    if (existing_user.length === 1) {
+      return setUser({
+        ...existing_user[0],
+        sessionUser: session && session.user,
+      });
+    }
+
+    const { data: new_user } = await supabase
+      .from("users")
+      .insert({
+        id: session.user.id,
+        full_name: session.user.user_metadata.full_name,
+        type: "coach",
+        google_access_token: localSession.provider_token,
+        google_refresh_token: localSession.refresh_token,
+      })
+      .select()
+      .single();
+
+    setUser({ ...new_user, sessionUser: session && session.user });
+  };
+
   window.sb = supabase;
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log("session", session);
-      setSession(session);
-      setLocalSession(session);
-      setLoading(false);
-    });
+    supabase.auth.getSession();
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setLocalSession(session);
-      setLoading(false);
+      _setSession(session);
     });
 
     return () => subscription.unsubscribe();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [supabase.auth, setLocalSession]);
 
   useEffect(() => {
@@ -62,10 +100,12 @@ export const AuthContextProvider = ({ children, supabase }) => {
   window.authContextValue = {
     session,
     localSession,
-    user: session && session.user,
+    sessionUser: session && session.user,
+    user: user,
     tokenClient,
     googleToken,
     loading: loading,
+    syncUser: syncUser,
     signIn: async () => {
       const { session, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
@@ -82,9 +122,7 @@ export const AuthContextProvider = ({ children, supabase }) => {
       if (error) {
         throw error;
       }
-      setSession(session);
-      setLocalSession(session);
-      setLoading(false);
+      _setSession(session);
     },
     refreshGoogleToken: async () => {
       tokenClient.requestAccessToken();
@@ -96,9 +134,7 @@ export const AuthContextProvider = ({ children, supabase }) => {
         throw error;
       }
 
-      setSession(null);
-      setLocalSession(null);
-      setLoading(false);
+      _setSession(null);
     },
   };
 

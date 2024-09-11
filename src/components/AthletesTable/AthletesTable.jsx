@@ -1,18 +1,20 @@
 import {
   Avatar,
   Box,
+  Button,
+  Chip,
   Paper,
   Table,
   TableBody,
   TableCell,
+  TableContainer,
   TableHead,
   TableRow,
   TextField,
   Typography,
 } from "@mui/material";
-import { Cancel, CheckCircle, Pool } from "@mui/icons-material";
+import { PersonAdd, Pool, Warning } from "@mui/icons-material";
 import { useState } from "react";
-import { drawerWidth } from "../SideBar/SideBar";
 
 const mockData = [
   {
@@ -21,30 +23,7 @@ const mockData = [
       pic: "/static/images/avatar/1.jpg",
       name: "Ali Connors",
     },
-    info: "in 2 days",
-    checkins: [1, 1, 0, 1, 1],
-    weight: [
-      {
-        date: "2021-10-01",
-        weight: 150,
-      },
-      {
-        date: "2021-10-02",
-        weight: 145,
-      },
-      {
-        date: "2021-10-03",
-        weight: 138,
-      },
-      {
-        date: "2021-10-04",
-        weight: 137,
-      },
-      {
-        date: "2021-10-05",
-        weight: 130,
-      },
-    ],
+    info: <Chip label="2 days" color="info" />,
   },
   {
     athlete: {
@@ -52,30 +31,13 @@ const mockData = [
       pic: "/static/images/avatar/2.jpg",
       name: "Travis Howard",
     },
-    info: "in 3 days",
-    checkins: [1, 1, 0, 0, 0],
-    weight: [
-      {
-        date: "2021-10-01",
-        weight: 150,
-      },
-      {
-        date: "2021-10-02",
-        weight: 145,
-      },
-      {
-        date: "2021-10-03",
-        weight: 138,
-      },
-      {
-        date: "2021-10-04",
-        weight: 137,
-      },
-      {
-        date: "2021-10-05",
-        weight: 130,
-      },
-    ],
+    info: (
+      <Chip
+        label="No schedule"
+        color="warning"
+        icon={<Warning color="warning" sx={{ height: 18 }} />}
+      />
+    ),
   },
   {
     athlete: {
@@ -83,30 +45,7 @@ const mockData = [
       pic: "/static/images/avatar/3.jpg",
       name: "Sandra Adams",
     },
-    info: "in 4 days",
-    checkins: [1, 0, 0, 1, 1],
-    weight: [
-      {
-        date: "2021-10-01",
-        weight: 150,
-      },
-      {
-        date: "2021-10-02",
-        weight: 145,
-      },
-      {
-        date: "2021-10-03",
-        weight: 138,
-      },
-      {
-        date: "2021-10-04",
-        weight: 137,
-      },
-      {
-        date: "2021-10-05",
-        weight: 130,
-      },
-    ],
+    info: <Chip label="4 days" color="info" />,
   },
   {
     athlete: {
@@ -114,30 +53,7 @@ const mockData = [
       pic: "/static/images/avatar/1.jpg",
       name: "Ali Connors",
     },
-    info: "in 2 days",
-    checkins: [1, 1, 0, 1, 1],
-    weight: [
-      {
-        date: "2021-10-01",
-        weight: 150,
-      },
-      {
-        date: "2021-10-02",
-        weight: 145,
-      },
-      {
-        date: "2021-10-03",
-        weight: 138,
-      },
-      {
-        date: "2021-10-04",
-        weight: 137,
-      },
-      {
-        date: "2021-10-05",
-        weight: 130,
-      },
-    ],
+    info: <Chip label="2 days" color="info" />,
   },
   {
     athlete: {
@@ -145,30 +61,7 @@ const mockData = [
       pic: "/static/images/avatar/2.jpg",
       name: "Travis Howard",
     },
-    info: "in 3 days",
-    checkins: [1, 1, 0, 0, 0],
-    weight: [
-      {
-        date: "2021-10-01",
-        weight: 150,
-      },
-      {
-        date: "2021-10-02",
-        weight: 145,
-      },
-      {
-        date: "2021-10-03",
-        weight: 138,
-      },
-      {
-        date: "2021-10-04",
-        weight: 137,
-      },
-      {
-        date: "2021-10-05",
-        weight: 130,
-      },
-    ],
+    info: <Chip label="2 days" color="info" />,
   },
   {
     athlete: {
@@ -176,123 +69,7 @@ const mockData = [
       pic: "/static/images/avatar/3.jpg",
       name: "Sandra Adams",
     },
-    info: "in 4 days",
-    checkins: [1, 0, 0, 1, 1],
-    weight: [
-      {
-        date: "2021-10-01",
-        weight: 150,
-      },
-      {
-        date: "2021-10-02",
-        weight: 145,
-      },
-      {
-        date: "2021-10-03",
-        weight: 138,
-      },
-      {
-        date: "2021-10-04",
-        weight: 137,
-      },
-      {
-        date: "2021-10-05",
-        weight: 130,
-      },
-    ],
-  },
-  {
-    athlete: {
-      id: 9,
-      pic: "/static/images/avatar/1.jpg",
-      name: "Ali Connors",
-    },
-    info: "in 2 days",
-    checkins: [1, 1, 0, 1, 1],
-    weight: [
-      {
-        date: "2021-10-01",
-        weight: 150,
-      },
-      {
-        date: "2021-10-02",
-        weight: 145,
-      },
-      {
-        date: "2021-10-03",
-        weight: 138,
-      },
-      {
-        date: "2021-10-04",
-        weight: 137,
-      },
-      {
-        date: "2021-10-05",
-        weight: 130,
-      },
-    ],
-  },
-  {
-    athlete: {
-      id: 7,
-      pic: "/static/images/avatar/2.jpg",
-      name: "Travis Howard",
-    },
-    info: "in 3 days",
-    checkins: [1, 1, 0, 0, 0],
-    weight: [
-      {
-        date: "2021-10-01",
-        weight: 150,
-      },
-      {
-        date: "2021-10-02",
-        weight: 145,
-      },
-      {
-        date: "2021-10-03",
-        weight: 138,
-      },
-      {
-        date: "2021-10-04",
-        weight: 137,
-      },
-      {
-        date: "2021-10-05",
-        weight: 130,
-      },
-    ],
-  },
-  {
-    athlete: {
-      id: 8,
-      pic: "/static/images/avatar/3.jpg",
-      name: "Sandra Adams",
-    },
-    info: "in 4 days",
-    checkins: [1, 0, 0, 1, 1],
-    weight: [
-      {
-        date: "2021-10-01",
-        weight: 150,
-      },
-      {
-        date: "2021-10-02",
-        weight: 145,
-      },
-      {
-        date: "2021-10-03",
-        weight: 138,
-      },
-      {
-        date: "2021-10-04",
-        weight: 137,
-      },
-      {
-        date: "2021-10-05",
-        weight: 130,
-      },
-    ],
+    info: <Chip label="2 days" color="info" />,
   },
 ];
 
@@ -313,33 +90,7 @@ const cols = [
   },
   {
     id: "info",
-    label: "Next Checkin",
-  },
-  {
-    id: "checkins",
-    label: "Last 5 Checkins",
-    format: (value) => (
-      <Box display="flex" alignItems="center">
-        {value.map((item, i) =>
-          item === 1 ? (
-            <CheckCircle
-              key={i}
-              style={{ width: 20, height: 20 }}
-              color="success"
-            />
-          ) : (
-            <Cancel key={i} style={{ width: 20, height: 20 }} color="error" />
-          )
-        )}
-      </Box>
-    ),
-  },
-  {
-    id: "weight",
-    label: "Weight",
-    format: (value) => {
-      return <div>1</div>;
-    },
+    label: "Next Event",
   },
 ];
 
@@ -347,34 +98,21 @@ export const AthletesTable = ({ pic, name, info }) => {
   const [search, setSearch] = useState("");
 
   return (
-    <Paper
-      sx={{
-        overflow: "auto",
-        mb: 4,
-        width: {
-          xs: "calc(100vw - 48px)",
-          sm: "calc(100vw - 48px)",
-          md: `calc(100vw - ${drawerWidth + 48}px)`,
-        },
-      }}
-    >
-      <Box
-        p={2}
-        display="flex"
-        alignItems="center"
-        height="80px"
-        sx={{
-          width: {
-            xs: "calc(100vw - 48px)",
-            sm: "calc(100vw - 48px)",
-            md: `calc(100vw - ${drawerWidth + 48}px)`,
-          },
-        }}
-      >
+    <Paper variant="outlined" sx={{ overflow: "hidden" }}>
+      <Box p={2} pb={1} display="flex" alignItems="center">
         <Pool style={{ marginRight: 12 }} />
-        <Typography variant="h6" fontWeight="900">
+        <Typography variant="subtitle" fontWeight="900">
           Your Athletes
         </Typography>
+        <Button
+          startIcon={<PersonAdd />}
+          size="small"
+          sx={{ marginLeft: "auto" }}
+        >
+          Invite
+        </Button>
+      </Box>
+      <Box px={2} pb={2}>
         <TextField
           id="standard-search"
           label="Search for athlete..."
@@ -385,41 +123,43 @@ export const AthletesTable = ({ pic, name, info }) => {
           onChange={(e) => setSearch(e.target.value)}
         />
       </Box>
-      <Table stickyHeader aria-label="sticky table">
-        <TableHead>
-          <TableRow>
-            {cols.map((column, i) => (
-              <TableCell
-                key={i}
-                align={column.align}
-                style={{ minWidth: column.minWidth }}
-              >
-                {column.label}
-              </TableCell>
-            ))}
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {mockData
-            .filter((row) =>
-              row.athlete.name.toLowerCase().includes(search.toLowerCase())
-            )
-            .map((row, i) => {
-              return (
-                <TableRow hover role="checkbox" tabIndex={-1} key={i}>
-                  {cols.map((column, i) => {
-                    const value = row[column.id];
-                    return (
-                      <TableCell key={i} align={column.align}>
-                        {column.format ? column.format(value) : value}
-                      </TableCell>
-                    );
-                  })}
-                </TableRow>
-              );
-            })}
-        </TableBody>
-      </Table>
+      <TableContainer sx={{ maxHeight: 300 }}>
+        <Table stickyHeader aria-label="sticky table">
+          <TableHead>
+            <TableRow>
+              {cols.map((column, i) => (
+                <TableCell
+                  key={i}
+                  align={column.align}
+                  style={{ minWidth: column.minWidth }}
+                >
+                  {column.label}
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {mockData
+              .filter((row) =>
+                row.athlete.name.toLowerCase().includes(search.toLowerCase())
+              )
+              .map((row, i) => {
+                return (
+                  <TableRow hover role="checkbox" tabIndex={-1} key={i}>
+                    {cols.map((column, i) => {
+                      const value = row[column.id];
+                      return (
+                        <TableCell key={i} align={column.align}>
+                          {column.format ? column.format(value) : value}
+                        </TableCell>
+                      );
+                    })}
+                  </TableRow>
+                );
+              })}
+          </TableBody>
+        </Table>
+      </TableContainer>
     </Paper>
   );
 };

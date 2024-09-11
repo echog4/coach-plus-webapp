@@ -44,7 +44,7 @@ const UserMenu = ({ user, signOut, anchorEl, handleOpen, handleClose }) => (
 );
 
 export const AppHeader = ({ handleDrawerToggle }) => {
-  const { session, user, signOut } = useAuth();
+  const { session, sessionUser, signOut } = useAuth();
   const [anchorEl, setAnchorEl] = React.useState(null);
 
   const handleOpen = (event) => {
@@ -88,7 +88,7 @@ export const AppHeader = ({ handleDrawerToggle }) => {
           <>
             <NotificationArea />
             <UserMenu
-              user={user}
+              user={sessionUser}
               signOut={signOut}
               anchorEl={anchorEl}
               handleOpen={handleOpen}

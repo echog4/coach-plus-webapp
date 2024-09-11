@@ -18,6 +18,7 @@ import { PageContainer } from "./components/PageContainer/PageContainer";
 import { OnboardingFormsRoute } from "./routes/OnboardingForms/OnboardingForms.route";
 import { OnboardingFormDisplayRoute } from "./routes/OnboardingFormDisplay/OnboardingFormDisplay.route";
 import { TrainingPlanRoute } from "./routes/TrainingPlan/TrainingPlan.route";
+import { PATH_COACH_ONBOARDING } from "./utils/constant";
 
 function App() {
   const [drawerOpen, setDrawerOpen] = React.useState(false);
@@ -79,7 +80,7 @@ function App() {
               }
             />
             <Route
-              path="/coach-onboarding"
+              path={PATH_COACH_ONBOARDING}
               element={
                 <ProtectedRoute>
                   <CoachOnboardingRoute />

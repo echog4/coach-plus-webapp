@@ -10,9 +10,10 @@ import {
 } from "@mui/material";
 import { PageContainer } from "../../components/PageContainer/PageContainer";
 import React from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { DateField } from "@mui/x-date-pickers";
-import { useAuth } from "../../providers/AuthContextProvider";
+import { useAuth, useSupabase } from "../../providers/AuthContextProvider";
+import { Navigate } from "react-router-dom";
 const steps = [
   "Personal Information",
   "Location and Contact",
@@ -21,10 +22,24 @@ const steps = [
 
 export const CoachOnboardingComponent = () => {
   const [activeStep, setActiveStep] = React.useState(0);
-  const { register, handleSubmit } = useForm();
-  const { user } = useAuth();
+  const { control, register, handleSubmit } = useForm();
+  const { sessionUser, syncUser, session, user } = useAuth();
+  const supabase = useSupabase();
 
-  const onSubmit = handleSubmit((data) => alert(JSON.stringify(data)));
+  const onSubmit = handleSubmit(async (data) => {
+    console.log({ data });
+    await supabase
+      .from("users")
+      .update({
+        ...data,
+        status: "ACTIVE",
+        onboarded_at: new Date().toISOString(),
+        full_name: `${data.first_name} ${data.last_name}`,
+      })
+      .eq("id", sessionUser.id);
+
+    await syncUser(session);
+  });
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -37,6 +52,10 @@ export const CoachOnboardingComponent = () => {
   const handleReset = () => {
     setActiveStep(0);
   };
+
+  if (user.onboarded_at) {
+    return <Navigate to="/" />;
+  }
 
   return (
     <PageContainer>
@@ -64,12 +83,17 @@ export const CoachOnboardingComponent = () => {
           ) : (
             <>
               <form onSubmit={onSubmit}>
-                <Typography sx={{ mb: 1 }} variant="h6">
+                <Typography sx={{ mb: 3 }} variant="h6">
                   {steps[activeStep]}
                 </Typography>
-                {activeStep === 0 && <PersonalInfo register={register} />}
+                {activeStep === 0 && (
+                  <PersonalInfo control={control} register={register} />
+                )}
                 {activeStep === 1 && (
-                  <LocationAndContact email={user.email} register={register} />
+                  <LocationAndContact
+                    email={sessionUser.email}
+                    register={register}
+                  />
                 )}
                 {activeStep === 2 && <Experience register={register} />}
               </form>
@@ -100,30 +124,31 @@ export const CoachOnboardingComponent = () => {
   );
 };
 
-const PersonalInfo = ({ register }) => (
+const PersonalInfo = ({ register, control }) => (
   <>
-    <Box sx={{ maxWidth: 300, mb: 1 }}>
-      <TextField
-        {...register("firstName")}
-        label="First Name"
-        variant="standard"
-        fullWidth
-      />
+    <Box sx={{ maxWidth: 400, mb: 3 }}>
+      <TextField {...register("first_name")} label="First Name" fullWidth />
     </Box>
-    <Box sx={{ maxWidth: 300, mb: 1 }}>
-      <TextField
-        {...register("lastName")}
-        label="Last Name"
-        variant="standard"
-        fullWidth
-      />
+    <Box sx={{ maxWidth: 400, mb: 3 }}>
+      <TextField {...register("last_name")} label="Last Name" fullWidth />
     </Box>
-    <Box sx={{ maxWidth: 300, mb: 1 }}>
-      <DateField
-        {...register("dob")}
-        label="Date of Birth"
-        variant="standard"
-        fullWidth
+    <Box sx={{ maxWidth: 400, mb: 3 }}>
+      <Controller
+        control={control}
+        name="dob"
+        rules={{ required: true }}
+        render={({ field }) => {
+          return (
+            <DateField
+              label="Date"
+              value={field.value}
+              inputRef={field.ref}
+              onChange={(date) => {
+                field.onChange(date);
+              }}
+            />
+          );
+        }}
       />
     </Box>
   </>
@@ -131,37 +156,25 @@ const PersonalInfo = ({ register }) => (
 
 const LocationAndContact = ({ register, email }) => (
   <>
-    <Box sx={{ maxWidth: 300, mb: 1 }}>
-      <TextField
-        {...register("city")}
-        label="City"
-        variant="standard"
-        fullWidth
-      />
+    <Box sx={{ maxWidth: 400, mb: 3 }}>
+      <TextField {...register("city")} label="City" fullWidth />
     </Box>
-    <Box sx={{ maxWidth: 300, mb: 1 }}>
-      <TextField
-        {...register("Country")}
-        label="Country"
-        variant="standard"
-        fullWidth
-      />
+    <Box sx={{ maxWidth: 400, mb: 3 }}>
+      <TextField {...register("country")} label="Country" fullWidth />
     </Box>
 
-    <Box sx={{ maxWidth: 300, mb: 1 }}>
+    <Box sx={{ maxWidth: 400, mb: 3 }}>
       <TextField
-        {...register("phone")}
+        {...register("phone_number")}
         label="Phone Number"
-        variant="standard"
-        type="number"
+        type="text"
         fullWidth
       />
     </Box>
-    <Box sx={{ maxWidth: 300, mb: 1 }}>
+    <Box sx={{ maxWidth: 400, mb: 3 }}>
       <TextField
         value={email}
         label="Email"
-        variant="standard"
         fullWidth
         InputProps={{
           readOnly: true,
@@ -175,26 +188,23 @@ const Experience = ({ register }) => (
   <>
     <Box sx={{ mb: 3 }}>
       <TextField
-        {...register("sportActivity")}
+        {...register("sports_activities")}
         label="What sport or activity do you coach?"
-        variant="standard"
         fullWidth
       />
     </Box>
     <Box sx={{ mb: 3 }}>
       <TextField
-        {...register("typesOfAthletes")}
+        {...register("athlete_types")}
         label="What types of athletes do you coach?"
-        variant="standard"
         helperText="e.g., amateur, professional, older adults"
         fullWidth
       />
     </Box>
     <Box sx={{ maxWidth: 400, mb: 3 }}>
       <TextField
-        {...register("typesOfAthletes")}
+        {...register("athlete_count")}
         label="How many athletes do you currently coach?"
-        variant="standard"
         type="number"
         fullWidth
       />
