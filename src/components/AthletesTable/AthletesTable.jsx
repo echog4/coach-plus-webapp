@@ -13,7 +13,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { Info, PersonAdd, Pool, Warning } from "@mui/icons-material";
+import { Check, Info, PersonAdd, Pool } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import AthleteInviteModal from "../AthleteInvitationModal/AthleteInvitationModal";
 import { useAuth, useSupabase } from "../../providers/AuthContextProvider";
@@ -70,7 +70,7 @@ const cols = [
           icon={<Info />}
         />
       ) : (
-        <Chip size="small" color="success" label="Onboarded" />
+        <Chip size="small" color="success" label="Onboarded" icon={<Check />} />
       );
     },
   },
@@ -83,10 +83,7 @@ export const AthletesTable = ({ pic, name, info }) => {
   const supabase = useSupabase();
   const { user } = useAuth();
 
-  useEffect(() => {
-    if (!user) {
-      return;
-    }
+  const getAthletes = () => {
     supabase
       .from("coach_athletes")
       .select("*, athletes(*, onboarding_form_response(*))")
@@ -95,12 +92,23 @@ export const AthletesTable = ({ pic, name, info }) => {
       .then(({ data }) => {
         setAthletes(data || []);
       });
+  };
+
+  useEffect(() => {
+    if (!user) {
+      return;
+    }
+    getAthletes();
     //  eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   return (
     <Paper variant="outlined" sx={{ overflow: "hidden" }}>
-      <AthleteInviteModal open={open} handleClose={() => setOpen(false)} />
+      <AthleteInviteModal
+        onSuccess={getAthletes}
+        open={open}
+        handleClose={() => setOpen(false)}
+      />
       <Box p={2} pb={1} display="flex" alignItems="center">
         <Pool style={{ marginRight: 12 }} />
         <Typography variant="subtitle" fontWeight="900">

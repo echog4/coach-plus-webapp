@@ -144,7 +144,7 @@ export default function OnboardingFormModal({
               welcome_message: welcomeMessage,
               icon: emoji,
             };
-            console.log(payload);
+
             const { data } = await supabase
               .from("onboarding_forms")
               .upsert(payload)

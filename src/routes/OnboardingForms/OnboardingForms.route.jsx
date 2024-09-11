@@ -29,8 +29,6 @@ export const OnboardingFormsRoute = () => {
       .eq("user_id", user.id)
       .is("deleted_at", null);
 
-    console.log(_forms);
-
     setForms(_forms || []);
   };
 

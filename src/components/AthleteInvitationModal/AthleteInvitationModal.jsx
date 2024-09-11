@@ -8,7 +8,7 @@ import { Autocomplete, Box, TextField, Typography } from "@mui/material";
 import { useAuth, useSupabase } from "../../providers/AuthContextProvider";
 import { useEffect, useState } from "react";
 
-export default function AthleteInviteModal({ open, handleClose }) {
+export default function AthleteInviteModal({ open, handleClose, onSuccess }) {
   const [loading, setLoading] = useState(false);
   const [forms, setForms] = useState([]);
   const [email, setEmail] = useState("");
@@ -87,6 +87,7 @@ export default function AthleteInviteModal({ open, handleClose }) {
       console.log({ newCoachAthlete, newCoachAthleteError });
     }
     setLoading(false);
+    onSuccess();
     handleClose();
     // create coach_athletes
   };

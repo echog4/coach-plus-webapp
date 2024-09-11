@@ -27,7 +27,6 @@ export const CoachOnboardingComponent = () => {
   const supabase = useSupabase();
 
   const onSubmit = handleSubmit(async (data) => {
-    console.log({ data });
     await supabase
       .from("users")
       .update({
@@ -141,7 +140,7 @@ const PersonalInfo = ({ register, control }) => (
         render={({ field }) => {
           return (
             <DateField
-              label="Date"
+              label="Date of Birth"
               value={field.value}
               inputRef={field.ref}
               onChange={(date) => {
