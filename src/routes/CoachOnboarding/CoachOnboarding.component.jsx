@@ -32,6 +32,7 @@ export const CoachOnboardingComponent = () => {
       .from("users")
       .update({
         ...data,
+        email: sessionUser.email,
         status: "ACTIVE",
         onboarded_at: new Date().toISOString(),
         full_name: `${data.first_name} ${data.last_name}`,

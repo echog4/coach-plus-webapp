@@ -25,7 +25,7 @@ export const OnboardingFormsRoute = () => {
   const getForms = async () => {
     const { data: _forms } = await supabase
       .from("onboarding_forms")
-      .select("*, onboarding_form_response(*, users(*))")
+      .select("*, onboarding_form_response(*, athletes(*))")
       .eq("user_id", user.id)
       .is("deleted_at", null);
 

@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 import { PersonAdd, Pool, Warning } from "@mui/icons-material";
 import { useState } from "react";
+import AthleteInviteModal from "../AthleteInvitationModal/AthleteInvitationModal";
 
 const mockData = [
   {
@@ -96,9 +97,11 @@ const cols = [
 
 export const AthletesTable = ({ pic, name, info }) => {
   const [search, setSearch] = useState("");
+  const [open, setOpen] = useState(true);
 
   return (
     <Paper variant="outlined" sx={{ overflow: "hidden" }}>
+      <AthleteInviteModal open={open} handleClose={() => setOpen(false)} />
       <Box p={2} pb={1} display="flex" alignItems="center">
         <Pool style={{ marginRight: 12 }} />
         <Typography variant="subtitle" fontWeight="900">
@@ -108,6 +111,7 @@ export const AthletesTable = ({ pic, name, info }) => {
           startIcon={<PersonAdd />}
           size="small"
           sx={{ marginLeft: "auto" }}
+          onClick={() => setOpen(true)}
         >
           Invite
         </Button>
