@@ -64,7 +64,7 @@ function App() {
               }
             />
             <Route
-              path="/athletes"
+              path="/athlete/:id"
               element={
                 <ProtectedRoute>
                   <AthleteRoute />

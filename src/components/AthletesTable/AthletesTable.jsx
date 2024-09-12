@@ -17,6 +17,7 @@ import { Check, Info, PersonAdd, Pool } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import AthleteInviteModal from "../AthleteInvitationModal/AthleteInvitationModal";
 import { useAuth, useSupabase } from "../../providers/AuthContextProvider";
+import { useNavigate } from "react-router-dom";
 
 export const searchInObjects = (searchTerm, objectsArray) => {
   // Convert the search term to lowercase for case-insensitive search
@@ -82,6 +83,7 @@ export const AthletesTable = ({ pic, name, info }) => {
   const [athletes, setAthletes] = useState([]);
   const supabase = useSupabase();
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const getAthletes = () => {
     supabase
@@ -157,7 +159,7 @@ export const AthletesTable = ({ pic, name, info }) => {
                   role="checkbox"
                   tabIndex={-1}
                   key={i}
-                  onClick={(event) => console.log(event, row.id)}
+                  onClick={() => navigate(`/athlete/${row.id}`)}
                   sx={{ cursor: "pointer" }}
                 >
                   {cols.map((column, i) => {

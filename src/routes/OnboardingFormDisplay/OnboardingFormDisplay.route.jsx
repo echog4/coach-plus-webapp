@@ -90,6 +90,15 @@ export const OnboardingFormDisplayRoute = () => {
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  if (!obf) {
+    return <PageContainer>Loading...</PageContainer>;
+  }
+
+  if (obf?.status === "completed") {
+    return <PageContainer>Form already completed</PageContainer>;
+  }
+
   return (
     <PageContainer>
       <Paper variant="outlined" sx={{ maxWidth: 600, margin: "auto" }}>
