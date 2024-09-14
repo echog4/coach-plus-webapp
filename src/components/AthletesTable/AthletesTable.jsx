@@ -77,7 +77,7 @@ const cols = [
   },
 ];
 
-export const AthletesTable = ({ pic, name, info }) => {
+export const AthletesTable = ({ pic, name, info, onAthletesLoad }) => {
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
   const [athletes, setAthletes] = useState([]);
@@ -88,11 +88,12 @@ export const AthletesTable = ({ pic, name, info }) => {
   const getAthletes = () => {
     supabase
       .from("coach_athletes")
-      .select("*, athletes(*, onboarding_form_response(*))")
+      .select("*, athletes(*, onboarding_form_response(*), calendars(*))")
       .eq("coach_id", user.id)
       .is("deleted_at", null)
       .then(({ data }) => {
         setAthletes(data || []);
+        onAthletesLoad && onAthletesLoad(data || []);
       });
   };
 
@@ -159,7 +160,7 @@ export const AthletesTable = ({ pic, name, info }) => {
                   role="checkbox"
                   tabIndex={-1}
                   key={i}
-                  onClick={() => navigate(`/athlete/${row.id}`)}
+                  onClick={() => navigate(`/athlete/${row.athletes.id}`)}
                   sx={{ cursor: "pointer" }}
                 >
                   {cols.map((column, i) => {

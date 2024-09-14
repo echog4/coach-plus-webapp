@@ -17,10 +17,10 @@ import parse from "date-fns/parse";
 import startOfWeek from "date-fns/startOfWeek";
 import getDay from "date-fns/getDay";
 import enUS from "date-fns/locale/en-US";
-import { useCalendar } from "../../providers/CalendarProvider";
-import { useEffect, useState } from "react";
 import { Progress } from "../Progress/Progress";
 import { AlarmAdd, CalendarMonth } from "@mui/icons-material";
+import { startOfMonth } from "date-fns";
+import { useState } from "react";
 
 const locales = {
   "en-US": enUS,
@@ -40,30 +40,16 @@ export const CalendarComponent = ({
   title,
   toggles,
   views,
+  events,
+  calendars,
+  onNewEventClick,
+  onEventSelect,
+  onReloadRequest,
+  onEventDelete,
+  onCalendarToggle,
 }) => {
-  const {
-    createEvent,
-    getCalendars,
-    toggleCalendar,
-    getSelectedEvents,
-    deleteEvent,
-    calendars,
-    gapiInited,
-  } = useCalendar();
-  // const { refreshGoogleToken } = useAuth();
   const [selectedEvent, setSelectedEvent] = useState(null);
-
-  const reloadCalendar = (soft) => {
-    getCalendars();
-  };
-
-  useEffect(() => {
-    if (gapiInited) {
-      reloadCalendar();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [gapiInited]);
-
+  console.log({ events });
   return (
     <>
       {!!selectedEvent && (
@@ -71,11 +57,10 @@ export const CalendarComponent = ({
           event={selectedEvent}
           open={!!selectedEvent}
           onClose={() => setSelectedEvent(null)}
-          onDelete={async (calId, evId) => {
+          onDelete={(calId, evId) => {
             if (window.confirm("Are you sure you want to delete this event?")) {
               setSelectedEvent(null);
-              await deleteEvent(calId, evId);
-              getCalendars();
+              onEventDelete(calId, evId);
             }
           }}
         />
@@ -90,30 +75,7 @@ export const CalendarComponent = ({
             startIcon={<AlarmAdd />}
             size="small"
             sx={{ marginLeft: "auto" }}
-            onClick={async () => {
-              await createEvent("primary", {
-                summary: "Coach+ Training",
-                description: `<ul>
-    <li>3 set of 10 pushups</li><li>3 set of 30 jumping jacks</li>
-    </ul>`,
-                start: {
-                  date: "2024-09-12",
-                  timeZone: "America/Los_Angeles",
-                },
-                end: {
-                  date: "2024-09-13",
-                  timeZone: "America/Los_Angeles",
-                },
-                reminders: {
-                  useDefault: false,
-                  overrides: [
-                    { method: "email", minutes: 24 * 60 },
-                    { method: "popup", minutes: 10 },
-                  ],
-                },
-              });
-              reloadCalendar();
-            }}
+            onClick={onNewEventClick}
           >
             New Event
           </Button>
@@ -132,7 +94,7 @@ export const CalendarComponent = ({
                   margin: 0.5,
                 }}
                 onClick={() => {
-                  toggleCalendar(cal.calendarId);
+                  onCalendarToggle(cal.calendarId);
                 }}
               />
             ))}
@@ -142,19 +104,34 @@ export const CalendarComponent = ({
           {calendars.length > 0 ? (
             <Calendar
               localizer={localizer}
-              events={getSelectedEvents() || []}
+              events={events || []}
               startAccessor="start"
               endAccessor="end"
               defaultView={defaultView}
               style={{ height: height || 340 }}
               popup
+              defaultDate={startOfMonth(new Date())}
               onSelectEvent={(event) => setSelectedEvent(event)}
               eventPropGetter={(event) => ({
                 style: {
                   backgroundColor: event.backgroundColor,
                   color: event.foregroundColor,
+                  cursor: "pointer",
+                  fontWeight: 500,
                 },
               })}
+              formats={{
+                agendaHeaderFormat: (date) =>
+                  date.start.toLocaleString("default", {
+                    month: "short",
+                    day: "numeric",
+                  }) +
+                  "  -  " +
+                  date.end.toLocaleString("default", {
+                    month: "short",
+                    day: "numeric",
+                  }),
+              }}
               allDayAccessor={(event) => event.allDay}
               views={views || ["month", "week", "day", "agenda"]}
             />

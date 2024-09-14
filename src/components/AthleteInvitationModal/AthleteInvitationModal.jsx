@@ -86,6 +86,7 @@ export default function AthleteInviteModal({ open, handleClose, onSuccess }) {
           .select();
       console.log({ newCoachAthlete, newCoachAthleteError });
     }
+
     setLoading(false);
     onSuccess();
     handleClose();
@@ -103,8 +104,6 @@ export default function AthleteInviteModal({ open, handleClose, onSuccess }) {
         .select("*, onboarding_form_response(*, athletes(*))")
         .eq("user_id", user.id)
         .is("deleted_at", null);
-
-      console.log(_forms);
 
       setForms(_forms || []);
     };

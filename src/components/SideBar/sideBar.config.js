@@ -15,7 +15,7 @@ export const sideBarConfig = [
   },
   {
     name: "Athletes",
-    path: "/athletes",
+    path: "/athlete/14",
     icon: <Pool />,
   },
   {

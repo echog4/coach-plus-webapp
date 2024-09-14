@@ -47,34 +47,66 @@ export const CalendarProvider = ({ children }) => {
         )
       );
     },
-    getCalendars: async () => {
+
+    getCalendar: async (calendarId, events = false) => {
+      const clResponse = await gapi.client.calendar.calendarList.get({
+        calendarId: calendarId,
+      });
+      const cResponse = await gapi.client.calendar.calendars.get({
+        calendarId: calendarId,
+      });
+      const calendar = cResponse.result;
+      const calendarList = clResponse.result;
+
+      return {
+        calendarId: calendarList.id,
+        color: calendarList.backgroundColor,
+        textColor: calendarList.foregroundColor,
+        title: calendarList.summary,
+        description: calendarList.description,
+        timeZone: calendar.timeZone,
+        events: events
+          ? (await window.calendarContextValue.getEvents(calendarList.id)).map(
+              (event) => ({
+                ...event,
+                calendarId: calendarList.id,
+                backgroundColor: calendarList.backgroundColor,
+                foregroundColor: calendarList.foregroundColor,
+              })
+            )
+          : [],
+      };
+    },
+    getCalendars: async (filter) => {
       const response = await gapi.client.calendar.calendarList.list();
-
+      console.log({ items: response.result.items });
       const cals = await Promise.all(
-        response.result.items.map(async (calendar) => {
-          const savedCalendar = calendars.find(
-            (c) => c.calendarId === calendar.id
-          );
+        response.result.items
+          //.filter((calendar) => (!filter ? true : filter.includes(calendar.id)))
+          .map(async (calendar) => {
+            const savedCalendar = calendars.find(
+              (c) => c.calendarId === calendar.id
+            );
 
-          return {
-            calendarId: calendar.id,
-            color: calendar.backgroundColor,
-            textColor: calendar.foregroundColor,
-            title: calendar.summary,
-            events:
-              savedCalendar && savedCalendar.hidden
-                ? []
-                : (
-                    await window.calendarContextValue.getEvents(calendar.id)
-                  ).map((event) => ({
-                    ...event,
-                    calendarId: calendar.id,
-                    backgroundColor: calendar.backgroundColor,
-                    foregroundColor: calendar.foregroundColor,
-                  })),
-            hidden: savedCalendar ? savedCalendar.hidden : false,
-          };
-        })
+            return {
+              calendarId: calendar.id,
+              color: calendar.backgroundColor,
+              textColor: calendar.foregroundColor,
+              title: calendar.summary,
+              events:
+                savedCalendar && savedCalendar.hidden
+                  ? []
+                  : (
+                      await window.calendarContextValue.getEvents(calendar.id)
+                    ).map((event) => ({
+                      ...event,
+                      calendarId: calendar.id,
+                      backgroundColor: calendar.backgroundColor,
+                      foregroundColor: calendar.foregroundColor,
+                    })),
+              hidden: savedCalendar ? savedCalendar.hidden : false,
+            };
+          })
       );
 
       setCalendars(cals);
@@ -99,7 +131,7 @@ export const CalendarProvider = ({ children }) => {
         resource: calendar,
       };
       const response = await gapi.client.calendar.calendars.insert(request);
-      setCalendars([...calendars, response.result]);
+      return response.result;
     },
     getEvents: async (calId, startTime) => {
       const st = startTime || startOfMonth(new Date());

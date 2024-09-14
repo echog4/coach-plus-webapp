@@ -1,13 +1,14 @@
 import {
-  Avatar,
   Box,
+  Button,
+  Chip,
+  CircularProgress,
   Dialog,
   DialogContent,
   DialogTitle,
   Divider,
   IconButton,
   List,
-  ListItem,
   ListItemButton,
   ListItemText,
   ListSubheader,
@@ -16,19 +17,115 @@ import {
 } from "@mui/material";
 import { PageContainer } from "../../components/PageContainer/PageContainer";
 import Grid2 from "@mui/material/Unstable_Grid2/Grid2";
-import { Close, Mail, Phone } from "@mui/icons-material";
+import {
+  Cancel,
+  Check,
+  CheckCircle,
+  Close,
+  Info,
+  Mail,
+  Phone,
+  WarningRounded,
+} from "@mui/icons-material";
 import { LineChart } from "@mui/x-charts";
-import { useState } from "react";
-
-const tileStyle = {
-  padding: 2,
-  border: "1px solid #ccc",
-  borderRadius: 4,
-  mr: 2,
-};
+import React, { useEffect, useState } from "react";
+import { useAuth, useSupabase } from "../../providers/AuthContextProvider";
+import { useParams } from "react-router-dom";
+import { useCalendar } from "../../providers/CalendarProvider";
+import { getAthleteName } from "../../utils/selectors";
+import { CalendarComponent } from "../../components/Calendar/Calendar";
+import { getReadableTextColor } from "../../utils/styles/theme";
 
 export const AthleteRoute = () => {
   const [open, setOpen] = useState(false);
+  const [athlete, setAthlete] = useState(null);
+  const [events, setEvents] = useState(null);
+
+  const params = useParams();
+  const supabase = useSupabase();
+  const { user } = useAuth();
+  const { createCalendar, getCalendar, getEvents, gapiInited } = useCalendar();
+  const [createCalendarLoading, setCreateCalendarLoading] = useState(false);
+
+  const createAthleteCalendar = async () => {
+    setCreateCalendarLoading(true);
+    try {
+      const calendarData = {
+        summary: `C+ ${getAthleteName(athlete)}`,
+        description: `Coach+ Training Calendar for ${getAthleteName(athlete)}`,
+        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      };
+
+      const calendar = await createCalendar(calendarData);
+      const the_calendar = await getCalendar(calendar.id);
+
+      const sbCalendar = {
+        gcal_id: calendar.id,
+        payload: the_calendar,
+        enabled: true,
+        public_url: `https://calendar.google.com/calendar/embed?src=${decodeURIComponent(
+          calendar.id
+        )}&ctz=${decodeURIComponent(calendar.timeZone)}`,
+        athlete_id: params.id,
+        coach_id: user.id,
+        time_zone: calendarData.timeZone,
+      };
+
+      await supabase.from("calendars").insert(sbCalendar);
+      await fetchAthlete();
+      createCalendarLoading(false);
+    } catch (e) {
+      console.error(e);
+      setCreateCalendarLoading(false);
+    }
+  };
+
+  const fetchAthlete = async () => {
+    const { data: athletes } = await supabase
+      .from("athletes")
+      .select(
+        "*, onboarding_form_response(*), check_ins(*), notifications(*), events(*), calendars(*)"
+      )
+      .eq("id", params.id)
+      .limit(10, { refrencedTable: "check_ins" });
+
+    console.log(athletes[0]);
+
+    setAthlete(athletes[0]);
+  };
+
+  useEffect(() => {
+    if (gapiInited) {
+      fetchAthlete();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gapiInited]);
+
+  useEffect(() => {
+    if (athlete && athlete.calendars.length > 0 && gapiInited) {
+      const cal = athlete.calendars[0];
+      const fetchEvents = async () => {
+        const events = await getEvents(cal.gcal_id);
+        setEvents(
+          events.map((event) => ({
+            ...event,
+            calendarId: cal.payload.calendarId,
+            backgroundColor: cal.payload.color,
+            foregroundColor: getReadableTextColor(cal.payload.textColor),
+          }))
+        );
+      };
+      fetchEvents();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [athlete, gapiInited]);
+
+  const isWaitingOnboarding =
+    athlete && athlete.onboarding_form_response[0].status !== "completed";
+
+  if (!athlete) {
+    return null;
+  }
 
   return (
     <div>
@@ -71,168 +168,220 @@ export const AthleteRoute = () => {
         </DialogContent>
       </Dialog>
       <PageContainer>
-        <Paper sx={{ mb: 4 }}>
-          <Box sx={{ padding: 4 }}>
-            <Grid2 container>
-              <Grid2 sx={{ marginRight: "auto" }}>
-                <Box display="flex" flexDirection="row">
-                  <Avatar
-                    alt="Mark Fox"
-                    src="/static/images/avatar/1.jpg"
-                    style={{ width: 64, height: 64, marginRight: 16 }}
+        <Paper sx={{ mb: 4 }} variant="outlined">
+          <Box sx={{ padding: 3 }}>
+            <Box display="flex" alignItems="center" mb={3}>
+              <Box>
+                <Typography variant="h6" fontWeight="900" sx={{ mr: 2, mb: 1 }}>
+                  {getAthleteName(athlete)}
+                </Typography>
+                {!isWaitingOnboarding ? (
+                  <Chip
+                    size="small"
+                    color="success"
+                    label="Onboarded"
+                    icon={<Check />}
                   />
-                  <Box>
-                    <Typography variant="h6" fontWeight="900">
-                      Mark Fox
+                ) : (
+                  <>
+                    <Chip
+                      size="small"
+                      color="info"
+                      label="Pending Onboarding"
+                      icon={<Info />}
+                    />
+                    <br />
+                    <Button
+                      target="_blank"
+                      href={`/onboarding-form/${athlete.onboarding_form_response[0].id}`}
+                    >
+                      Go to Onboarding Form
+                    </Button>
+                  </>
+                )}
+              </Box>
+              <IconButton
+                size="small"
+                href={`tel:${athlete.phone_number}`}
+                sx={{ mr: 1, marginLeft: "auto" }}
+              >
+                <Phone />
+              </IconButton>
+              <IconButton size="small" href={`mailto:${athlete.email}`}>
+                <Mail />
+              </IconButton>
+            </Box>
+
+            {!isWaitingOnboarding && (
+              <Box>
+                <Typography variant="subtitle2">
+                  <Box display="flex" alignItems="center" mb={3}>
+                    {athlete.events[0] ? (
+                      <>
+                        <CheckCircle
+                          color="success"
+                          sx={{ mr: 1, height: 26, width: "auto" }}
+                        />
+                        {/* TODO: add next session in days */}
+                        {getAthleteName(athlete)} has an upcoming session in 2
+                        days!
+                      </>
+                    ) : (
+                      <>
+                        <WarningRounded
+                          color="warning"
+                          sx={{ mr: 1, height: 30, width: "auto" }}
+                        />{" "}
+                        {getAthleteName(athlete)} has no upcoming sessions
+                        scheduled!
+                      </>
+                    )}
+                  </Box>
+                </Typography>
+                {athlete.calendars.length === 0 && (
+                  <Typography variant="subtitle2">
+                    <Box display="flex" alignItems="center" mb={3}>
+                      <WarningRounded
+                        color="warning"
+                        sx={{ mr: 1, height: 30, width: "auto" }}
+                      />{" "}
+                      {getAthleteName(athlete)} has no Calendars!
+                      <Button
+                        onClick={() => createAthleteCalendar()}
+                        sx={{ ml: 2 }}
+                        color="success"
+                        disabled={createCalendarLoading}
+                      >
+                        Create Calendar
+                      </Button>
+                      {createCalendarLoading && (
+                        <CircularProgress
+                          size={20}
+                          sx={{ ml: 2 }}
+                          color="info"
+                        />
+                      )}
+                    </Box>
+                  </Typography>
+                )}
+                <Box display="flex" flexWrap="wrap">
+                  <Box mr={4}>
+                    <Typography variant="subtitle2" mb={2}>
+                      Height
                     </Typography>
-                    <Box>
-                      <IconButton aria-label="delete" color="info">
-                        <Phone />
-                      </IconButton>
-                      <IconButton aria-label="delete" color="info">
-                        <Mail />
-                      </IconButton>
+                    <Typography variant="h5">
+                      {athlete.onboarding_form_response[0].height} cm
+                    </Typography>
+                  </Box>
+                  <Box mr={4}>
+                    <Typography variant="subtitle2" mb={2}>
+                      Weight
+                    </Typography>
+                    <Typography variant="h5">
+                      {athlete.onboarding_form_response[0].weight} kg
+                    </Typography>
+                  </Box>
+                  <Box mr={4}>
+                    <Typography variant="subtitle2" mb={2}>
+                      Last 5 check-ins:
+                    </Typography>
+                    <Box display="flex" mb={2}>
+                      {[1, 1, 0, 0, 1].map((a, i) => (
+                        <Box key={i} sx={{ mr: 1 }}>
+                          {a === 1 ? (
+                            <CheckCircle color="success" />
+                          ) : (
+                            <Cancel color="warning" />
+                          )}
+                        </Box>
+                      ))}
                     </Box>
                   </Box>
+                  {false && (
+                    <Box>
+                      <Typography variant="subtitle2" mb={0.5}>
+                        Weight over time:
+                      </Typography>
+                      <Box mb={2}>
+                        <LineChart
+                          width={200}
+                          height={50}
+                          leftAxis={null}
+                          bottomAxis={null}
+                          series={[{ data: [65, 64, 73, 71, 72], label: "kg" }]}
+                          slotProps={{ legend: { hidden: true } }}
+                          margin={{
+                            left: 10,
+                            right: 10,
+                            top: 0,
+                            bottom: 0,
+                          }}
+                          xAxis={[
+                            {
+                              scaleType: "point",
+                              data: [
+                                "May 1",
+                                "May 8",
+                                "May 15",
+                                "May 22",
+                                "June 2",
+                              ],
+                            },
+                          ]}
+                        />
+                      </Box>
+                    </Box>
+                  )}
                 </Box>
-              </Grid2>
-              <Grid2>
-                <Box display="flex" flexDirection="row">
-                  <Box sx={tileStyle}>
-                    <Typography variant="body1" fontWeight="900">
-                      in 2 days
-                    </Typography>
-                    <Typography variant="caption" fontWeight="900">
-                      Next Check-In
-                    </Typography>
-                  </Box>
-                  <Box sx={tileStyle}>
-                    <Typography variant="body1" fontWeight="900">
-                      54
-                    </Typography>
-                    <Typography variant="caption" fontWeight="900">
-                      Total Check-Ins
-                    </Typography>
-                  </Box>
-                  <Box sx={{ ...tileStyle, padding: 0 }}>
-                    <LineChart
-                      width={200}
-                      height={50}
-                      leftAxis={null}
-                      bottomAxis={null}
-                      series={[{ data: [65, 64, 73, 71, 72], label: "kg" }]}
-                      slotProps={{ legend: { hidden: true } }}
-                      margin={{
-                        left: 10,
-                        right: 10,
-                        top: 0,
-                        bottom: 0,
-                      }}
-                      xAxis={[
-                        {
-                          scaleType: "point",
-                          data: [
-                            "May 1",
-                            "May 8",
-                            "May 15",
-                            "May 22",
-                            "June 2",
-                          ],
-                        },
-                      ]}
-                    />
-                    <Typography
-                      variant="caption"
-                      fontWeight="900"
-                      sx={{ pl: 2 }}
-                    >
-                      Weight over time
-                    </Typography>
-                  </Box>
-                </Box>
-              </Grid2>
-            </Grid2>
+              </Box>
+            )}
           </Box>
         </Paper>
-        <Grid2 container spacing={2}>
-          <Grid2 item xs={12} md={6}>
-            <Paper sx={{ overflow: "auto", height: 320, mb: 4 }}>
-              <Box>
+        {!isWaitingOnboarding && (
+          <Grid2 container spacing={2}>
+            <Grid2 xs={12} md={6}>
+              <Paper variant="outlined" sx={{ overflow: "auto", height: 320 }}>
                 <Box>
                   <List
                     sx={{
                       width: "100%",
                       bgcolor: "background.paper",
                     }}
-                    subheader={<ListSubheader>Latest feedback</ListSubheader>}
+                    subheader={<ListSubheader>Check-ins</ListSubheader>}
                   >
-                    {Array.from({ length: 8 }).map(() => (
-                      <ListItemButton>
-                        <ListItemText
-                          onClick={() => setOpen(true)}
-                          primary="Sent a new feedback. Click here to see it"
-                          secondary="Jan 9, 2014"
-                        />
-                      </ListItemButton>
+                    {/* TODO Implement check-ins */}
+                    {Array.from({ length: 8 }).map((a, i) => (
+                      <React.Fragment key={i}>
+                        <ListItemButton>
+                          <ListItemText
+                            onClick={() => setOpen(true)}
+                            primary="Sent a new feedback. Click here to see it"
+                            secondary="Jan 9, 2014"
+                          />
+                        </ListItemButton>
+                        <Divider />
+                      </React.Fragment>
                     ))}
                   </List>
                 </Box>
-              </Box>
-            </Paper>
+              </Paper>
+            </Grid2>
+            <Grid2 xs={12} md={6}>
+              {athlete && athlete.calendars.length > 0 && (
+                <CalendarComponent
+                  height={240}
+                  title="This month"
+                  defaultView="agenda"
+                  calendars={[athlete.calendars[0]]}
+                  events={events}
+                  views={["agenda"]}
+                />
+              )}
+            </Grid2>
           </Grid2>
-          <Grid2 item xs={12} md={6}>
-            <Paper sx={{ overflow: "auto", height: 320, mb: 4 }}>
-              <Box>
-                <Box>
-                  <List
-                    sx={{
-                      width: "100%",
-                      bgcolor: "background.paper",
-                    }}
-                    subheader={<ListSubheader>Activity</ListSubheader>}
-                  >
-                    <ListItem>
-                      <ListItemText
-                        primary="Checked in for his session"
-                        secondary="Jan 9, 2014"
-                      />
-                    </ListItem>
-                    <Divider></Divider>
-                    <ListItem>
-                      <ListItemText
-                        primary="Missed his session"
-                        secondary="Jan 9, 2014"
-                      />
-                    </ListItem>
-                    <Divider></Divider>
-                    <ListItem>
-                      <ListItemText
-                        primary="Checked in for his session"
-                        secondary="Jan 9, 2014"
-                      />
-                    </ListItem>
-                    <Divider></Divider>
-                    <ListItem>
-                      <ListItemText
-                        primary="Missed his session"
-                        secondary="Jan 9, 2014"
-                      />
-                    </ListItem>
-                    <Divider></Divider>
-                    <ListItem>
-                      <ListItemText
-                        primary="Missed his session"
-                        secondary="Jan 9, 2014"
-                      />
-                    </ListItem>
-                  </List>
-                </Box>
-              </Box>
-            </Paper>
-          </Grid2>
-        </Grid2>
+        )}
         <Paper>
-          <Box p={4}>
+          {/* <Box p={4}>
             <Typography variant="h6" fontWeight="900">
               Calendar
             </Typography>
@@ -244,7 +393,7 @@ export const AthleteRoute = () => {
               frameborder="0"
               scrolling="no"
             ></iframe>
-          </Box>
+          </Box> */}
         </Paper>
       </PageContainer>
     </div>

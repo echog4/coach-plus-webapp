@@ -16,7 +16,7 @@ import {
   SportsBaseball,
 } from "@mui/icons-material";
 
-export const CoachProfileCard = ({ user }) => (
+export const CoachProfileCard = ({ user, athletes }) => (
   <Paper variant="outlined">
     <Box p={3} pb={1}>
       <Box
@@ -55,7 +55,7 @@ export const CoachProfileCard = ({ user }) => (
         <Chip icon={<LocationOn />} label={`${user?.city}, ${user?.country}`} />
         <Chip icon={<SportsBaseball />} label={user?.sports_activities} />
         <Chip icon={<Face />} label={user?.athlete_types} />
-        <Chip icon={<Numbers />} label={user?.athlete_count} />
+        <Chip icon={<Numbers />} label={athletes && athletes.length} />
       </Box>
     </Box>
   </Paper>

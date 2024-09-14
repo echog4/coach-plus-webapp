@@ -14,18 +14,9 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "../../services/supabase";
 
-export const forms = [
-  {
-    id: 1,
-    icon: "🏊",
-    title: "Swimming Training",
-    sentTo: 4,
-    responded: 2,
-  },
-];
-
 export const OnboardingFormDisplayRoute = () => {
   const [obf, setObf] = useState(null);
+
   const {
     register,
     handleSubmit,
@@ -33,6 +24,28 @@ export const OnboardingFormDisplayRoute = () => {
     formState: { errors },
   } = useForm();
   const params = useParams();
+
+  // const { createCalendar } = useCalendar();
+
+  //   // create calendar
+  //   const calendarData = {
+  //     summary: `C+ `,
+  //     description: `Coach+ Training Calendar for test`,
+  //     timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+  //   };
+
+  //   const calendar = await createCalendar(calendarData);
+
+  //   const sbCalendar = {
+  //     gcal_id: calendar.id,
+  //     payload: calendar,
+  //     enabled: true,
+  //     public_url: `https://calendar.google.com/calendar/embed?src=${decodeURIComponent(
+  //       calendar.id
+  //     )}&ctz=${decodeURIComponent(calendar.timeZone)}`,
+  //   };
+
+  //   await supabase.from("calendars").insert(sbCalendar);
 
   const onSubmit = handleSubmit(
     async ({
@@ -69,12 +82,13 @@ export const OnboardingFormDisplayRoute = () => {
       };
 
       await supabase.from("onboarding_form_response").upsert(formResponseData);
+
       alert(
         "Thank you for completeing the form. You will be notified via Google Calendar when your training starts."
       );
     }
   );
-
+  console.log(obf);
   useEffect(() => {
     supabase
       .from("onboarding_form_response")
