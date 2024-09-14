@@ -14,6 +14,7 @@ import ResponsesModal from "../../components/ResponsesModal/ResponsesModal";
 import { useEffect, useState } from "react";
 import OnboardingFormModal from "../../components/OnboardingFormModal/OnboardingFormModal";
 import { useAuth, useSupabase } from "../../providers/AuthContextProvider";
+import { getOnboardingFormsByUserId } from "../../services/query";
 
 export const OnboardingFormsRoute = () => {
   const [forms, setForms] = useState([]);
@@ -23,11 +24,10 @@ export const OnboardingFormsRoute = () => {
   const { user } = useAuth();
 
   const getForms = async () => {
-    const { data: _forms } = await supabase
-      .from("onboarding_forms")
-      .select("*, onboarding_form_response(*, athletes(*))")
-      .eq("user_id", user.id)
-      .is("deleted_at", null);
+    const { data: _forms } = await getOnboardingFormsByUserId(
+      supabase,
+      user.id
+    );
 
     setForms(_forms || []);
   };

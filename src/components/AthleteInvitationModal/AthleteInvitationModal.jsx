@@ -7,6 +7,14 @@ import DialogTitle from "@mui/material/DialogTitle";
 import { Autocomplete, Box, TextField, Typography } from "@mui/material";
 import { useAuth, useSupabase } from "../../providers/AuthContextProvider";
 import { useEffect, useState } from "react";
+import {
+  getAthleteByEmail,
+  getCoachAthlete,
+  getOnboardingFormsByUserId,
+  insertAthlete,
+  insertCoachAthlete,
+  insertOnboardingFormResponse,
+} from "../../services/query";
 
 export default function AthleteInviteModal({ open, handleClose, onSuccess }) {
   const [loading, setLoading] = useState(false);
@@ -31,18 +39,13 @@ export default function AthleteInviteModal({ open, handleClose, onSuccess }) {
       email,
     };
 
-    const { data: existingAthlete, error: _athleteError } = await supabase
-      .from("athletes")
-      .select()
-      .eq("email", email);
+    const { data: existingAthlete, error: _athleteError } =
+      await getAthleteByEmail(supabase, email);
 
     if (existingAthlete.length > 0) {
       athlete = existingAthlete[0];
     } else {
-      const { data: newAthlete } = await supabase
-        .from("athletes")
-        .insert([athlete])
-        .select();
+      const { data: newAthlete } = await insertAthlete(supabase, [athlete]);
       if (newAthlete) {
         athlete = newAthlete[0];
       }
@@ -51,39 +54,32 @@ export default function AthleteInviteModal({ open, handleClose, onSuccess }) {
     console.log({ athlete, _athleteError });
 
     // create "onboarding_form_response"
-    const { data: newResponse, error: newResponseError } = await supabase
-      .from("onboarding_form_response")
-      .insert([
+    const { data: newResponse, error: newResponseError } =
+      await insertOnboardingFormResponse(supabase, [
         {
           athlete_id: athlete.id,
           coach_id: user.id,
           form_id: selectedForm.id,
           status: "sent",
         },
-      ])
-      .select();
+      ]);
 
     console.log({ newResponse, newResponseError });
 
     // find coach_athlete
-    const { data: coachAthlete, error: coachAthleteError } = await supabase
-      .from("coach_athletes")
-      .select()
-      .eq("coach_id", user.id)
-      .eq("athlete_id", athlete.id);
+    const { data: coachAthlete, error: coachAthleteError } =
+      await getCoachAthlete(supabase, user.id, athlete.id);
+
     console.log({ coachAthlete, coachAthleteError });
 
     if (coachAthlete.length === 0) {
       const { data: newCoachAthlete, error: newCoachAthleteError } =
-        await supabase
-          .from("coach_athletes")
-          .insert([
-            {
-              coach_id: user.id,
-              athlete_id: athlete.id,
-            },
-          ])
-          .select();
+        await insertCoachAthlete(supabase, [
+          {
+            coach_id: user.id,
+            athlete_id: athlete.id,
+          },
+        ]);
       console.log({ newCoachAthlete, newCoachAthleteError });
     }
 
@@ -99,11 +95,10 @@ export default function AthleteInviteModal({ open, handleClose, onSuccess }) {
     }
 
     const getForms = async () => {
-      const { data: _forms } = await supabase
-        .from("onboarding_forms")
-        .select("*, onboarding_form_response(*, athletes(*))")
-        .eq("user_id", user.id)
-        .is("deleted_at", null);
+      const { data: _forms } = await getOnboardingFormsByUserId(
+        supabase,
+        user.id
+      );
 
       setForms(_forms || []);
     };

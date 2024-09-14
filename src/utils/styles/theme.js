@@ -12,6 +12,7 @@ export const theme = createTheme({
     warning: {
       main: "#fa9b2a",
       light: "#ffe4c9",
+      contrastText: "#fff",
     },
     yellow: {
       main: "#f7d154",
@@ -20,6 +21,7 @@ export const theme = createTheme({
     success: {
       main: "#19c558",
       light: "#d1f2d8",
+      contrastText: "#fff",
     },
     info: {
       main: "#2f80ed",

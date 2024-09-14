@@ -14,6 +14,7 @@ import {
 import { useEffect, useState } from "react";
 import { sportsEmojis } from "../../routes/OnboardingForms/constants";
 import { useAuth, useSupabase } from "../../providers/AuthContextProvider";
+import { upsertOnboardingForm } from "../../services/query";
 
 export default function OnboardingFormModal({
   open,
@@ -145,10 +146,7 @@ export default function OnboardingFormModal({
               icon: emoji,
             };
 
-            const { data } = await supabase
-              .from("onboarding_forms")
-              .upsert(payload)
-              .select();
+            const { data } = await upsertOnboardingForm(supabase, payload);
             setLoading(false);
             onSuccess(data[0]);
           }}

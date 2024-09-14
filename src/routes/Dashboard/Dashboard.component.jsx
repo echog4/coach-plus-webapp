@@ -10,15 +10,12 @@ import { CreateEventModal } from "../../components/CreateEventModal/CreateEventM
 
 export const DashboardComponent = ({ user }) => {
   const [athletes, setAthletes] = useState([]);
-  const [eventModalOpen, setEventModalOpen] = useState(true);
+  const [eventModalOpen, setEventModalOpen] = useState(false);
   const supabase = useSupabase();
   const { getCalendars } = useCalendar();
 
   useEffect(() => {
-    // const sb_calendars = supabase.from("calendars").select().eq("coach_id", user.id);
-    // const getCalendar
-    // // eslint-disable-next-line react-hooks/exhaustive-deps
-    console.log({ athletes });
+    // TODO: handle calendar data
   }, [user, athletes]);
 
   if (!user) {

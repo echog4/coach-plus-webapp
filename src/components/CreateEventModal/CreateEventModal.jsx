@@ -28,6 +28,11 @@ export const CreateEventModal = ({
 
   const handleSubmit = async () => {
     setLoading(true);
+    const payload = {
+      athlete_id: selectedAthlete.id,
+      event_date: eventDate,
+    };
+    console.log({ payload });
 
     setLoading(false);
     onSuccess && onSuccess();

@@ -1,4 +1,4 @@
-import { DateField } from "@mui/x-date-pickers";
+import { MobileDatePicker } from "@mui/x-date-pickers";
 import { PageContainer } from "../../components/PageContainer/PageContainer";
 import {
   Box,
@@ -13,6 +13,11 @@ import { Controller, useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "../../services/supabase";
+import {
+  getOnboardingFormResponseById,
+  upsertAthlete,
+  upsertOnboardingFormResponse,
+} from "../../services/query";
 
 export const OnboardingFormDisplayRoute = () => {
   const [obf, setObf] = useState(null);
@@ -24,28 +29,6 @@ export const OnboardingFormDisplayRoute = () => {
     formState: { errors },
   } = useForm();
   const params = useParams();
-
-  // const { createCalendar } = useCalendar();
-
-  //   // create calendar
-  //   const calendarData = {
-  //     summary: `C+ `,
-  //     description: `Coach+ Training Calendar for test`,
-  //     timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-  //   };
-
-  //   const calendar = await createCalendar(calendarData);
-
-  //   const sbCalendar = {
-  //     gcal_id: calendar.id,
-  //     payload: calendar,
-  //     enabled: true,
-  //     public_url: `https://calendar.google.com/calendar/embed?src=${decodeURIComponent(
-  //       calendar.id
-  //     )}&ctz=${decodeURIComponent(calendar.timeZone)}`,
-  //   };
-
-  //   await supabase.from("calendars").insert(sbCalendar);
 
   const onSubmit = handleSubmit(
     async ({
@@ -71,8 +54,6 @@ export const OnboardingFormDisplayRoute = () => {
         status: "VERIFIED",
       };
 
-      await supabase.from("athletes").upsert(athleteData);
-
       const formResponseData = {
         id: obf.id,
         height,
@@ -81,27 +62,29 @@ export const OnboardingFormDisplayRoute = () => {
         status: "completed",
       };
 
-      await supabase.from("onboarding_form_response").upsert(formResponseData);
+      await upsertAthlete(supabase, athleteData);
+
+      await upsertOnboardingFormResponse(supabase, formResponseData);
 
       alert(
         "Thank you for completeing the form. You will be notified via Google Calendar when your training starts."
       );
+
+      window.location.reload();
     }
   );
-  console.log(obf);
+
   useEffect(() => {
-    supabase
-      .from("onboarding_form_response")
-      .select("* , onboarding_forms(*)")
-      .eq("id", params.id)
-      .then(({ data, error }) => {
+    getOnboardingFormResponseById(supabase, params.id).then(
+      ({ data, error }) => {
         if (error) {
           console.error(error);
           return;
         }
-        console.log(data[0]);
+
         setObf(data[0]);
-      });
+      }
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -181,13 +164,13 @@ export const OnboardingFormDisplayRoute = () => {
                 rules={{ required: true }}
                 render={({ field }) => {
                   return (
-                    <DateField
+                    <MobileDatePicker
                       label="Date of Birth"
-                      value={field.value}
-                      inputRef={field.ref}
-                      onChange={(date) => {
-                        field.onChange(date);
+                      sx={{
+                        width: "100%",
                       }}
+                      value={field.value}
+                      onChange={(date) => field.onChange(date)}
                       error={errors.dob}
                       helperText={errors.dob ? "This field is required" : ""}
                       fullWidth

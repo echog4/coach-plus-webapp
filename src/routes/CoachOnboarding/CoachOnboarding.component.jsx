@@ -14,6 +14,7 @@ import { Controller, useForm } from "react-hook-form";
 import { DateField } from "@mui/x-date-pickers";
 import { useAuth, useSupabase } from "../../providers/AuthContextProvider";
 import { Navigate } from "react-router-dom";
+import { updateCoach } from "../../services/query";
 const steps = [
   "Personal Information",
   "Location and Contact",
@@ -27,16 +28,17 @@ export const CoachOnboardingComponent = () => {
   const supabase = useSupabase();
 
   const onSubmit = handleSubmit(async (data) => {
-    await supabase
-      .from("users")
-      .update({
+    await updateCoach(
+      supabase,
+      {
         ...data,
         email: sessionUser.email,
         status: "ACTIVE",
         onboarded_at: new Date().toISOString(),
         full_name: `${data.first_name} ${data.last_name}`,
-      })
-      .eq("id", sessionUser.id);
+      },
+      sessionUser.id
+    );
 
     await syncUser(session);
   });

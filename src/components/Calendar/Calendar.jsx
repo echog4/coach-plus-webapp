@@ -49,7 +49,7 @@ export const CalendarComponent = ({
   onCalendarToggle,
 }) => {
   const [selectedEvent, setSelectedEvent] = useState(null);
-  console.log({ events });
+
   return (
     <>
       {!!selectedEvent && (

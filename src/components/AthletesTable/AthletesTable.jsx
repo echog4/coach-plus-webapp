@@ -13,11 +13,18 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { Check, Info, PersonAdd, Pool } from "@mui/icons-material";
+import {
+  Check,
+  Info,
+  PersonAdd,
+  Pool,
+  WarningRounded,
+} from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import AthleteInviteModal from "../AthleteInvitationModal/AthleteInvitationModal";
 import { useAuth, useSupabase } from "../../providers/AuthContextProvider";
 import { useNavigate } from "react-router-dom";
+import { getAthletesByCoachId } from "../../services/query";
 
 export const searchInObjects = (searchTerm, objectsArray) => {
   // Convert the search term to lowercase for case-insensitive search
@@ -70,6 +77,13 @@ const cols = [
           label="Pending Onboarding"
           icon={<Info />}
         />
+      ) : athlete.calendars.length === 0 ? (
+        <Chip
+          size="small"
+          color="warning"
+          label="No Calendar"
+          icon={<WarningRounded />}
+        />
       ) : (
         <Chip size="small" color="success" label="Onboarded" icon={<Check />} />
       );
@@ -86,15 +100,10 @@ export const AthletesTable = ({ pic, name, info, onAthletesLoad }) => {
   const navigate = useNavigate();
 
   const getAthletes = () => {
-    supabase
-      .from("coach_athletes")
-      .select("*, athletes(*, onboarding_form_response(*), calendars(*))")
-      .eq("coach_id", user.id)
-      .is("deleted_at", null)
-      .then(({ data }) => {
-        setAthletes(data || []);
-        onAthletesLoad && onAthletesLoad(data || []);
-      });
+    getAthletesByCoachId(supabase, user.id).then(({ data }) => {
+      setAthletes(data || []);
+      onAthletesLoad && onAthletesLoad(data || []);
+    });
   };
 
   useEffect(() => {

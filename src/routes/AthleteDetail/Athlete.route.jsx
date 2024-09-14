@@ -35,6 +35,7 @@ import { useCalendar } from "../../providers/CalendarProvider";
 import { getAthleteName } from "../../utils/selectors";
 import { CalendarComponent } from "../../components/Calendar/Calendar";
 import { getReadableTextColor } from "../../utils/styles/theme";
+import { getAthleteProfile, insertCalendar } from "../../services/query";
 
 export const AthleteRoute = () => {
   const [open, setOpen] = useState(false);
@@ -71,7 +72,7 @@ export const AthleteRoute = () => {
         time_zone: calendarData.timeZone,
       };
 
-      await supabase.from("calendars").insert(sbCalendar);
+      await insertCalendar(supabase, sbCalendar);
       await fetchAthlete();
       createCalendarLoading(false);
     } catch (e) {
@@ -81,16 +82,7 @@ export const AthleteRoute = () => {
   };
 
   const fetchAthlete = async () => {
-    const { data: athletes } = await supabase
-      .from("athletes")
-      .select(
-        "*, onboarding_form_response(*), check_ins(*), notifications(*), events(*), calendars(*)"
-      )
-      .eq("id", params.id)
-      .limit(10, { refrencedTable: "check_ins" });
-
-    console.log(athletes[0]);
-
+    const { data: athletes } = await getAthleteProfile(supabase, params.id);
     setAthlete(athletes[0]);
   };
 
