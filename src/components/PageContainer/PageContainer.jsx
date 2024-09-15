@@ -17,6 +17,9 @@ export const PageContainer = ({ children, ...props }) => (
         md: 4,
         lg: 4,
       },
+      pb: {
+        xs: 6,
+      },
     }}
   >
     <Toolbar />
