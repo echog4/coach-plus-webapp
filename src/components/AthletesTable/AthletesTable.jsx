@@ -14,7 +14,7 @@ import {
   Typography,
 } from "@mui/material";
 import {
-  Check,
+  CalendarMonth,
   Info,
   PersonAdd,
   Pool,
@@ -25,6 +25,7 @@ import AthleteInviteModal from "../AthleteInvitationModal/AthleteInvitationModal
 import { useAuth, useSupabase } from "../../providers/AuthContextProvider";
 import { useNavigate } from "react-router-dom";
 import { getAthletesByCoachId } from "../../services/query";
+import { getDistanceText } from "../../utils/calendar";
 
 export const searchInObjects = (searchTerm, objectsArray) => {
   // Convert the search term to lowercase for case-insensitive search
@@ -69,27 +70,43 @@ const cols = [
   {
     id: "athletes",
     label: "Status",
-    format: (athlete) => {
-      return athlete.status === "PENDING" ? (
-        <Chip
-          size="small"
-          color="info"
-          label="Pending Onboarding"
-          icon={<Info />}
-        />
-      ) : athlete.calendars.length === 0 ? (
-        <Chip
-          size="small"
-          color="warning"
-          label="No Calendar"
-          icon={<WarningRounded />}
-        />
-      ) : (
-        <Chip size="small" color="success" label="Onboarded" icon={<Check />} />
-      );
-    },
+    format: (athlete) => <GetAthleteStatus athlete={athlete} />,
   },
 ];
+
+export const GetAthleteStatus = ({ athlete }) =>
+  athlete.status === "PENDING" ? (
+    <Chip
+      size="small"
+      color="info"
+      label="Pending Onboarding"
+      icon={<Info />}
+    />
+  ) : athlete.calendars.length === 0 ? (
+    <Chip
+      size="small"
+      color="error"
+      label="No Calendar"
+      icon={<WarningRounded />}
+      sx={{ pl: 0.2 }}
+    />
+  ) : athlete.events.length === 0 ? (
+    <Chip
+      size="small"
+      color="warning"
+      label="No Scheduled Events"
+      icon={<CalendarMonth />}
+      sx={{ pl: 0.2 }}
+    />
+  ) : (
+    <Chip
+      size="small"
+      color="success"
+      label={`${getDistanceText(athlete.events[0].date)}`}
+      icon={<CalendarMonth />}
+      sx={{ pl: 0.2 }}
+    />
+  );
 
 export const AthletesTable = ({ pic, name, info, onAthletesLoad }) => {
   const [search, setSearch] = useState("");

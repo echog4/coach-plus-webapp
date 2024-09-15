@@ -13,9 +13,13 @@ export const getAthleteByEmail = async (supabase, email) =>
 export const getAthletesByCoachId = async (supabase, coach_id) =>
   supabase
     .from("coach_athletes")
-    .select("*, athletes(*, onboarding_form_response(*), calendars(*))")
+    .select(
+      "*, athletes(*, onboarding_form_response(*), calendars(*), events(*))"
+    )
     .eq("coach_id", coach_id)
-    .is("deleted_at", null);
+    .is("deleted_at", null)
+    .order("date", { ascending: true, referencedTable: "athletes.events" })
+    .limit(1, { referencedTable: "athletes.events" });
 
 export const getAthleteProfile = async (supabase, athlete_id) =>
   await supabase
@@ -24,7 +28,7 @@ export const getAthleteProfile = async (supabase, athlete_id) =>
       "*, onboarding_form_response(*), check_ins(*), notifications(*), events(*), calendars(*)"
     )
     .eq("id", athlete_id)
-    .limit(10, { refrencedTable: "check_ins" });
+    .limit(10, { referencedTable: "check_ins" });
 
 export const insertAthlete = async (supabase, athlete) =>
   await supabase.from("athletes").insert([athlete]).select();

@@ -19,10 +19,8 @@ import { PageContainer } from "../../components/PageContainer/PageContainer";
 import Grid2 from "@mui/material/Unstable_Grid2/Grid2";
 import {
   Cancel,
-  Check,
   CheckCircle,
   Close,
-  Info,
   Mail,
   Phone,
   WarningRounded,
@@ -43,6 +41,7 @@ import {
 import { getTimeZone } from "../../utils/calendar";
 import { CreateEventModal } from "../../components/CreateEventModal/CreateEventModal";
 import { noop } from "../../utils/noop";
+import { GetAthleteStatus } from "../../components/AthletesTable/AthletesTable";
 
 export const AthleteRoute = () => {
   const [open, setOpen] = useState(false);
@@ -181,29 +180,14 @@ export const AthleteRoute = () => {
                 <Typography variant="h6" fontWeight="900" sx={{ mr: 2, mb: 1 }}>
                   {getAthleteName(athlete)}
                 </Typography>
-                {!isWaitingOnboarding ? (
-                  <Chip
-                    size="small"
-                    color="success"
-                    label="Onboarded"
-                    icon={<Check />}
-                  />
-                ) : (
-                  <>
-                    <Chip
-                      size="small"
-                      color="info"
-                      label="Pending Onboarding"
-                      icon={<Info />}
-                    />
-                    <br />
-                    <Button
-                      target="_blank"
-                      href={`/onboarding-form/${athlete.onboarding_form_response[0].id}`}
-                    >
-                      Go to Onboarding Form
-                    </Button>
-                  </>
+                <GetAthleteStatus athlete={athlete} />
+                {isWaitingOnboarding && (
+                  <Button
+                    target="_blank"
+                    href={`/onboarding-form/${athlete.onboarding_form_response[0].id}`}
+                  >
+                    Go to Onboarding Form
+                  </Button>
                 )}
               </Box>
               <IconButton

@@ -15,7 +15,11 @@ import {
   insertEvent,
 } from "../../services/query";
 import { useCalendar } from "../../providers/CalendarProvider";
-import { getTimeZone, renderGCalDescription } from "../../utils/calendar";
+import {
+  getTimeZone,
+  renderGCalDescription,
+  getSQLDate,
+} from "../../utils/calendar";
 import { addDays, format } from "date-fns";
 
 export const CreateEventModal = ({
@@ -67,7 +71,7 @@ export const CreateEventModal = ({
     }
 
     const gcal_id = selectedAthlete.calendars[0].gcal_id;
-
+    const sb_start = getSQLDate(eventDate);
     const start = format(eventDate, "yyyy-MM-dd");
     const end = format(addDays(eventDate, 1), "yyyy-MM-dd");
 
@@ -96,7 +100,7 @@ export const CreateEventModal = ({
     const gcal_event = await createEvent(gcal_id, gcal_payload);
     // Create supabase event
     const sb_event = {
-      date: eventDate,
+      date: sb_start,
       calendar_id: selectedAthlete.calendars[0].id,
       gcal_id,
       payload: gcal_event,
