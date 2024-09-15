@@ -60,9 +60,9 @@ const cols = [
           <Avatar
             alt={name}
             src={name}
-            style={{ width: 30, height: 30, marginRight: 16 }}
+            style={{ width: 30, height: 30, marginRight: 8 }}
           />
-          <span>{name}</span>
+          <span>{name.replace("@gmail.com", "")}</span>
         </Box>
       );
     },
@@ -79,8 +79,9 @@ export const GetAthleteStatus = ({ athlete }) =>
     <Chip
       size="small"
       color="info"
-      label="Pending Onboarding"
+      label="Invited"
       icon={<Info />}
+      sx={{ fontWeight: 600 }}
     />
   ) : athlete.calendars.length === 0 ? (
     <Chip
@@ -88,15 +89,15 @@ export const GetAthleteStatus = ({ athlete }) =>
       color="error"
       label="No Calendar"
       icon={<WarningRounded />}
-      sx={{ pl: 0.2 }}
+      sx={{ pl: 0.3, fontWeight: 600 }}
     />
   ) : athlete.events.length === 0 ? (
     <Chip
       size="small"
       color="warning"
-      label="No Scheduled Events"
+      label="No Schedule"
       icon={<CalendarMonth />}
-      sx={{ pl: 0.2 }}
+      sx={{ pl: 0.3, fontWeight: 600 }}
     />
   ) : (
     <Chip
@@ -104,7 +105,7 @@ export const GetAthleteStatus = ({ athlete }) =>
       color="success"
       label={`${getDistanceText(athlete.events[0].date)}`}
       icon={<CalendarMonth />}
-      sx={{ pl: 0.2 }}
+      sx={{ pl: 0.3, fontWeight: 600 }}
     />
   );
 
@@ -172,6 +173,12 @@ export const AthletesTable = ({ pic, name, info, onAthletesLoad }) => {
                   key={i}
                   align={column.align}
                   style={{ minWidth: column.minWidth }}
+                  sx={{
+                    p: {
+                      xs: 1,
+                      sm: 2,
+                    },
+                  }}
                 >
                   {column.label}
                 </TableCell>
@@ -192,7 +199,16 @@ export const AthletesTable = ({ pic, name, info, onAthletesLoad }) => {
                   {cols.map((column, i) => {
                     const value = row[column.id];
                     return (
-                      <TableCell key={i} align={column.align}>
+                      <TableCell
+                        key={i}
+                        align={column.align}
+                        sx={{
+                          p: {
+                            xs: 1,
+                            sm: 2,
+                          },
+                        }}
+                      >
                         {column.format ? column.format(value) : value}
                       </TableCell>
                     );

@@ -61,8 +61,8 @@ export const CalendarComponent = ({
         cal.events.map((e) => ({
           allDay: true,
           resource: e.payload,
-          start: startOfDay(e.payload.start.date),
-          end: endOfDay(e.payload.start.date),
+          start: startOfDay(e.date),
+          end: endOfDay(e.date),
           title: e.payload.summary,
           backgroundColor: cal.payload.color,
           foregroundColor: getReadableTextColor(cal.payload.color),
@@ -112,6 +112,7 @@ export const CalendarComponent = ({
                 label={cal?.payload.title?.replace("@gmail.com", "")}
                 variant={!cal.enabled ? "outlined" : "filled"}
                 sx={{
+                  fontWeight: 600,
                   backgroundColor: !cal.enabled
                     ? "transparent"
                     : cal.payload.color,

@@ -123,7 +123,7 @@ export const ExerciseModal = ({ open, handleClose, exercise, onSuccess }) => {
               </FormGroup>
             </Box>
             <Grid2 container spacing={2}>
-              <Grid2 item xs={12} sm={4}>
+              <Grid2 xs={12} sm={4}>
                 <TextField
                   {...register("units.sets")}
                   label="Sets"
@@ -131,7 +131,7 @@ export const ExerciseModal = ({ open, handleClose, exercise, onSuccess }) => {
                   fullWidth
                 />
               </Grid2>
-              <Grid2 item xs={12} sm={4}>
+              <Grid2 xs={12} sm={4}>
                 <TextField
                   {...register("units.reps")}
                   label="Reps"
@@ -139,7 +139,7 @@ export const ExerciseModal = ({ open, handleClose, exercise, onSuccess }) => {
                   fullWidth
                 />
               </Grid2>
-              <Grid2 item xs={12} sm={4}>
+              <Grid2 xs={12} sm={4}>
                 <TextField
                   {...register("units.rest")}
                   label="Rest in seconds"
@@ -147,7 +147,7 @@ export const ExerciseModal = ({ open, handleClose, exercise, onSuccess }) => {
                   fullWidth
                 />
               </Grid2>
-              <Grid2 item xs={12} sm={6}>
+              <Grid2 xs={12} sm={6}>
                 <TextField
                   {...register("units.distance")}
                   label="Distance in meters"
@@ -155,7 +155,7 @@ export const ExerciseModal = ({ open, handleClose, exercise, onSuccess }) => {
                   fullWidth
                 />
               </Grid2>
-              <Grid2 item xs={12} sm={6}>
+              <Grid2 xs={12} sm={6}>
                 <TextField
                   {...register("units.time")}
                   label="Time in minutes"
@@ -216,7 +216,7 @@ export const ExerciseModal = ({ open, handleClose, exercise, onSuccess }) => {
           </Box>
           <Grid2 container spacing={2} sx={{ mb: 2 }}>
             {videos.map((v, i) => (
-              <Grid2 key={i} item xs={4}>
+              <Grid2 key={i} xs={4}>
                 <Card
                   sx={{
                     aspectRatio: 16 / 9,
@@ -303,7 +303,7 @@ export const ExerciseModal = ({ open, handleClose, exercise, onSuccess }) => {
           </Box>
           <Grid2 container spacing={2}>
             {images.map((image, i) => (
-              <Grid2 key={i} item xs={4}>
+              <Grid2 key={i} xs={4}>
                 <Card
                   sx={{
                     aspectRatio: 16 / 9,
@@ -340,7 +340,7 @@ export const ExerciseModal = ({ open, handleClose, exercise, onSuccess }) => {
               </Grid2>
             ))}
           </Grid2>
-          <Grid2 item xs={4} sx={{ height: 20 }}></Grid2>
+          <Grid2 xs={4} sx={{ height: 20 }}></Grid2>
         </DialogContent>
         <DialogActions>
           <Button type="submit" color="success" disabled={loading}>

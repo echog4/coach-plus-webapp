@@ -65,10 +65,12 @@ export const TrainingPlanModal = ({
   const [loading, setLoading] = useState(false);
   const [selectedExercises, setSelectedExercises] = useState([]);
   const { register, handleSubmit } = useForm({
-    defaultValues: { name: plan.name, overview: plan.overview } || {
-      name: "",
-      overview: "",
-    },
+    defaultValues: plan
+      ? { name: plan.name, overview: plan.overview }
+      : {
+          name: "",
+          overview: "",
+        },
   });
   const { user } = useAuth();
   const supabase = useSupabase();
