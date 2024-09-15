@@ -79,7 +79,6 @@ export const CalendarProvider = ({ children }) => {
     },
     getCalendars: async (filter) => {
       const response = await gapi.client.calendar.calendarList.list();
-      console.log({ items: response.result.items });
       const cals = await Promise.all(
         response.result.items
           //.filter((calendar) => (!filter ? true : filter.includes(calendar.id)))
@@ -165,8 +164,7 @@ export const CalendarProvider = ({ children }) => {
         calendarId: calendarId,
         resource: event,
       };
-      await gapi.client.calendar.events.insert(request);
-      await window.calendarContextValue.getEvents(calendarId);
+      return (await gapi.client.calendar.events.insert(request)).result;
     },
     deleteEvent: async (calendarId, eventId) => {
       const request = {
@@ -174,7 +172,7 @@ export const CalendarProvider = ({ children }) => {
         eventId: eventId,
       };
       const response = await gapi.client.calendar.events.delete(request);
-      console.log({ response });
+      return response.result;
     },
   };
 

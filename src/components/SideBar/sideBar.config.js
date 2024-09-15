@@ -4,7 +4,6 @@ import {
   Checklist,
   Dashboard,
   ManageAccounts,
-  Pool,
 } from "@mui/icons-material";
 
 export const sideBarConfig = [
@@ -12,11 +11,6 @@ export const sideBarConfig = [
     name: "Dashboard",
     path: "/",
     icon: <Dashboard />,
-  },
-  {
-    name: "Athletes",
-    path: "/athlete/14",
-    icon: <Pool />,
   },
   {
     name: "Training Plans",

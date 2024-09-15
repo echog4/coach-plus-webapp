@@ -129,3 +129,59 @@ export const insertExercisePlans = async (supabase, exercise_plan) =>
 
 export const deleteExercisePlans = async (supabase, id) =>
   await supabase.from("exercise_plans").delete().eq("plan_id", id);
+
+// CALENDARS
+// CALENDARS
+// CALENDARS
+export const getCalendarsByCoachId = async (supabase, coach_id) =>
+  await supabase
+    .from("calendars")
+    .select("*, events(*), athletes(*)")
+    .eq("coach_id", coach_id)
+    .is("deleted_at", null)
+    .order("id", { ascending: true });
+
+export const getCalendarsByCoachIdAthleteId = async (
+  supabase,
+  coach_id,
+  athlete_id
+) =>
+  await supabase
+    .from("calendars")
+    .select("*, events(*), athletes(*)")
+    .eq("coach_id", coach_id)
+    .eq("athlete_id", athlete_id)
+    .is("deleted_at", null);
+
+export const toggleCalendar = async (supabase, id, enabled) =>
+  await supabase.from("calendars").update({ enabled }).eq("id", id);
+
+// EVENTS
+// EVENTS
+// EVENTS
+export const getEventsByCoachId = async (supabase, coach_id) =>
+  await supabase
+    .from("events")
+    .select()
+    .eq("coach_id", coach_id)
+    .gte("date", new Date())
+    .is("deleted_at", null);
+
+export const getEventsByCoachIdAthleteId = async (
+  supabase,
+  coach_id,
+  athlete_id
+) =>
+  await supabase
+    .from("events")
+    .select()
+    .eq("athlete_id", athlete_id)
+    .eq("coach_id", coach_id)
+    .gte("date", new Date())
+    .is("deleted_at", null);
+
+export const insertEvent = async (supabase, event) =>
+  await supabase.from("events").insert(event).select();
+
+export const deleteEvent = async (supabase, id) =>
+  await supabase.from("events").update({ deleted_at: new Date() }).eq("id", id);

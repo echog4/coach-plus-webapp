@@ -34,19 +34,42 @@ import { useParams } from "react-router-dom";
 import { useCalendar } from "../../providers/CalendarProvider";
 import { getAthleteName } from "../../utils/selectors";
 import { CalendarComponent } from "../../components/Calendar/Calendar";
-import { getReadableTextColor } from "../../utils/styles/theme";
-import { getAthleteProfile, insertCalendar } from "../../services/query";
+
+import {
+  getAthleteProfile,
+  getCalendarsByCoachIdAthleteId,
+  insertCalendar,
+} from "../../services/query";
+import { getTimeZone } from "../../utils/calendar";
+import { CreateEventModal } from "../../components/CreateEventModal/CreateEventModal";
+import { noop } from "../../utils/noop";
 
 export const AthleteRoute = () => {
   const [open, setOpen] = useState(false);
   const [athlete, setAthlete] = useState(null);
-  const [events, setEvents] = useState(null);
 
   const params = useParams();
   const supabase = useSupabase();
   const { user } = useAuth();
-  const { createCalendar, getCalendar, getEvents, gapiInited } = useCalendar();
+  const [calendars, setCalendars] = useState([]);
+  const { createCalendar, getCalendar, gapiInited } = useCalendar();
   const [createCalendarLoading, setCreateCalendarLoading] = useState(false);
+  const [eventModalOpen, setEventModalOpen] = useState(false);
+
+  const reloadCalendars = () =>
+    getCalendarsByCoachIdAthleteId(supabase, user.id, params.id).then(
+      (calendars) => {
+        setCalendars(calendars.data);
+      }
+    );
+  useEffect(() => {
+    // TODO: handle calendar data
+    if (!user) {
+      return;
+    }
+    reloadCalendars();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   const createAthleteCalendar = async () => {
     setCreateCalendarLoading(true);
@@ -54,7 +77,7 @@ export const AthleteRoute = () => {
       const calendarData = {
         summary: `C+ ${getAthleteName(athlete)}`,
         description: `Coach+ Training Calendar for ${getAthleteName(athlete)}`,
-        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        timeZone: getTimeZone(),
       };
 
       const calendar = await createCalendar(calendarData);
@@ -93,25 +116,6 @@ export const AthleteRoute = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gapiInited]);
 
-  useEffect(() => {
-    if (athlete && athlete.calendars.length > 0 && gapiInited) {
-      const cal = athlete.calendars[0];
-      const fetchEvents = async () => {
-        const events = await getEvents(cal.gcal_id);
-        setEvents(
-          events.map((event) => ({
-            ...event,
-            calendarId: cal.payload.calendarId,
-            backgroundColor: cal.payload.color,
-            foregroundColor: getReadableTextColor(cal.payload.textColor),
-          }))
-        );
-      };
-      fetchEvents();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [athlete, gapiInited]);
-
   const isWaitingOnboarding =
     athlete && athlete.onboarding_form_response[0].status !== "completed";
 
@@ -121,6 +125,16 @@ export const AthleteRoute = () => {
 
   return (
     <div>
+      {eventModalOpen && (
+        <CreateEventModal
+          open={eventModalOpen}
+          handleClose={() => setEventModalOpen(false)}
+          onSuccess={() => {
+            reloadCalendars();
+          }}
+          athleteId={params.id}
+        />
+      )}
       <Dialog
         onClose={() => setOpen(false)}
         aria-labelledby="customized-dialog-title"
@@ -364,9 +378,13 @@ export const AthleteRoute = () => {
                   height={240}
                   title="This month"
                   defaultView="agenda"
-                  calendars={[athlete.calendars[0]]}
-                  events={events}
+                  calendars={calendars}
+                  toggles={calendars.length > 1}
                   views={["agenda"]}
+                  onNewEventClick={() => {
+                    setEventModalOpen(true);
+                  }}
+                  onCalendarToggle={noop}
                 />
               )}
             </Grid2>

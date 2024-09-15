@@ -19,8 +19,9 @@ import getDay from "date-fns/getDay";
 import enUS from "date-fns/locale/en-US";
 import { Progress } from "../Progress/Progress";
 import { AlarmAdd, CalendarMonth } from "@mui/icons-material";
-import { startOfMonth } from "date-fns";
-import { useState } from "react";
+import { endOfDay, startOfDay, startOfMonth } from "date-fns";
+import { useEffect, useState } from "react";
+import { getReadableTextColor } from "../../utils/styles/theme";
 
 const locales = {
   "en-US": enUS,
@@ -40,7 +41,6 @@ export const CalendarComponent = ({
   title,
   toggles,
   views,
-  events,
   calendars,
   onNewEventClick,
   onEventSelect,
@@ -48,7 +48,31 @@ export const CalendarComponent = ({
   onEventDelete,
   onCalendarToggle,
 }) => {
+  const [events, setEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
+
+  useEffect(() => {
+    if (!calendars || calendars.length === 0) {
+      return;
+    }
+
+    const allEvents = calendars
+      .filter((cal) => cal.enabled)
+      .map((cal) =>
+        cal.events.map((e) => ({
+          allDay: true,
+          resource: e.payload,
+          start: startOfDay(e.payload.start.date),
+          end: endOfDay(e.payload.start.date),
+          title: e.payload.summary,
+          backgroundColor: cal.payload.color,
+          foregroundColor: getReadableTextColor(cal.payload.color),
+        }))
+      )
+      .flat();
+
+    setEvents(allEvents);
+  }, [calendars]);
 
   return (
     <>
@@ -86,15 +110,25 @@ export const CalendarComponent = ({
               <Chip
                 key={cal.calendarId}
                 size="small"
-                label={cal.title.replace("@gmail.com", "")}
-                variant={cal.hidden ? "outlined" : "filled"}
+                label={cal?.payload.title?.replace("@gmail.com", "")}
+                variant={!cal.enabled ? "outlined" : "filled"}
                 sx={{
-                  backgroundColor: cal.hidden ? "transparent" : cal.color,
-                  color: cal.hidden ? cal.color : cal.textColor,
+                  backgroundColor: !cal.enabled
+                    ? "transparent"
+                    : cal.payload.color,
+                  color: !cal.enabled
+                    ? cal.payload.color
+                    : getReadableTextColor(cal.payload.color),
                   margin: 0.5,
+                  "&:hover": {
+                    backgroundColor: cal.payload.color,
+                    color: cal.enabled
+                      ? getReadableTextColor(cal.payload.color)
+                      : cal.payload.color,
+                  },
                 }}
                 onClick={() => {
-                  onCalendarToggle(cal.calendarId);
+                  onCalendarToggle(cal.id);
                 }}
               />
             ))}
