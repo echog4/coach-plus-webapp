@@ -11,7 +11,7 @@ import {
 import { PageContainer } from "../../components/PageContainer/PageContainer";
 import React from "react";
 import { Controller, useForm } from "react-hook-form";
-import { DateField, MobileDatePicker } from "@mui/x-date-pickers";
+import { MobileDatePicker } from "@mui/x-date-pickers";
 import { useAuth, useSupabase } from "../../providers/AuthContextProvider";
 import { Navigate } from "react-router-dom";
 import { updateCoach } from "../../services/query";

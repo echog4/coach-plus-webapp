@@ -29,7 +29,11 @@ export const SideBar = ({
       <List>
         {sideBarConfig.map((item, index) => (
           <ListItem key={item.name} disablePadding>
-            <ListItemButton component={Link} to={item.path}>
+            <ListItemButton
+              component={Link}
+              to={item.path}
+              onClick={handleDrawerClose}
+            >
               <ListItemIcon>{item.icon}</ListItemIcon>
               <ListItemText primary={item.name} />
             </ListItemButton>

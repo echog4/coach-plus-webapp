@@ -17,7 +17,6 @@ import parse from "date-fns/parse";
 import startOfWeek from "date-fns/startOfWeek";
 import getDay from "date-fns/getDay";
 import enUS from "date-fns/locale/en-US";
-import { Progress } from "../Progress/Progress";
 import { AlarmAdd, CalendarMonth } from "@mui/icons-material";
 import { endOfDay, startOfDay, startOfMonth } from "date-fns";
 import { useEffect, useState } from "react";
