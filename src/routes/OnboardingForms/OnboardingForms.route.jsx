@@ -4,7 +4,6 @@ import {
   Avatar,
   Box,
   Button,
-  Fab,
   IconButton,
   Paper,
   TextField,
@@ -156,15 +155,6 @@ export const OnboardingFormsRoute = () => {
             ))}
         </Grid2>
       </PageContainer>
-      <Fab
-        variant="extended"
-        sx={{ position: "fixed", bottom: 32, right: 32 }}
-        color="info"
-        onClick={() => setFormOpen(true)}
-      >
-        <Add sx={{ mr: 1 }} />
-        Create New Form
-      </Fab>
       <ResponsesModal
         open={!!responsesOpen}
         formData={responsesOpen}

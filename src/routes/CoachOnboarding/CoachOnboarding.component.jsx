@@ -61,13 +61,22 @@ export const CoachOnboardingComponent = () => {
 
   return (
     <PageContainer>
-      <Paper>
-        <Box sx={{ width: "100%", p: 3 }}>
+      <Paper variant="outlined">
+        <Box sx={{ width: "100%", p: 2 }}>
           <Stepper activeStep={activeStep} sx={{ mb: 6 }}>
             {steps.map((label, index) => {
               return (
                 <Step key={label}>
-                  <StepLabel>{label}</StepLabel>
+                  <StepLabel>
+                    <Typography
+                      variant="subtitle"
+                      sx={{
+                        fontSize: { xs: 12, sm: 14 },
+                      }}
+                    >
+                      {label}
+                    </Typography>
+                  </StepLabel>
                 </Step>
               );
             })}
