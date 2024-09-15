@@ -14,7 +14,10 @@ import ResponsesModal from "../../components/ResponsesModal/ResponsesModal";
 import { useEffect, useState } from "react";
 import OnboardingFormModal from "../../components/OnboardingFormModal/OnboardingFormModal";
 import { useAuth, useSupabase } from "../../providers/AuthContextProvider";
-import { getOnboardingFormsByUserId } from "../../services/query";
+import {
+  deleteOnboardingForm,
+  getOnboardingFormsByUserId,
+} from "../../services/query";
 
 export const OnboardingFormsRoute = () => {
   const [forms, setForms] = useState([]);
@@ -101,10 +104,7 @@ export const OnboardingFormsRoute = () => {
                             "Are you sure you want to delete this form?"
                           )
                         ) {
-                          supabase
-                            .from("onboarding_forms")
-                            .update({ deleted_at: new Date().toISOString() })
-                            .eq("id", form.id)
+                          deleteOnboardingForm(supabase, form.id)
                             .then(() => {
                               getForms();
                             })

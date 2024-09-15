@@ -1,8 +1,5 @@
 // COACH
 // COACH
-
-import { supabase } from "./supabase";
-
 // COACH
 export const updateCoach = async (supabase, user, user_id) =>
   await supabase.from("users").update(user).eq("id", user_id);
@@ -67,6 +64,12 @@ export const getOnboardingFormsByUserId = async (supabase, user_id) =>
 export const upsertOnboardingForm = async (supabase, onboarding_form) =>
   await supabase.from("onboarding_forms").upsert(onboarding_form).select();
 
+export const deleteOnboardingForm = async (supabase, id) =>
+  await supabase
+    .from("onboarding_forms")
+    .update({ deleted_at: new Date() })
+    .eq("id", id);
+
 //  OBFORM RESPONSE
 //  OBFORM RESPONSE
 //  OBFORM RESPONSE
@@ -88,3 +91,41 @@ export const upsertOnboardingFormResponse = async (
   supabase,
   onboarding_form_response
 ) => supabase.from("onboarding_form_response").upsert(onboarding_form_response);
+
+// TRAINING PLANS
+// TRAINING PLANS
+// TRAINING PLANS
+export const getExercisesByCoachId = async (supabase, coach_id) =>
+  await supabase
+    .from("exercises")
+    .select()
+    .eq("coach_id", coach_id)
+    .is("deleted_at", null);
+
+export const getPlansByCoachId = async (supabase, coach_id) =>
+  await supabase
+    .from("plans")
+    .select("*, exercise_plans(*, exercises(*))")
+    .eq("coach_id", coach_id)
+    .is("deleted_at", null);
+
+export const upsertExercise = async (supabase, exercise) =>
+  await supabase.from("exercises").upsert(exercise).select();
+
+export const deleteExercise = async (supabase, id) =>
+  await supabase
+    .from("exercises")
+    .update({ deleted_at: new Date() })
+    .eq("id", id);
+
+export const upsertPlan = async (supabase, plan) =>
+  await supabase.from("plans").upsert(plan).select();
+
+export const deletePlan = async (supabase, id) =>
+  await supabase.from("plans").update({ deleted_at: new Date() }).eq("id", id);
+
+export const insertExercisePlans = async (supabase, exercise_plan) =>
+  await supabase.from("exercise_plans").insert(exercise_plan).select();
+
+export const deleteExercisePlans = async (supabase, id) =>
+  await supabase.from("exercise_plans").delete().eq("plan_id", id);

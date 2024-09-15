@@ -4,15 +4,15 @@ import { CoachProfileCard } from "../../components/CoachProfileCard/CoachProfile
 import { CalendarComponent } from "../../components/Calendar/Calendar";
 import Grid2 from "@mui/material/Unstable_Grid2/Grid2";
 import { useEffect, useState } from "react";
-import { useSupabase } from "../../providers/AuthContextProvider";
-import { useCalendar } from "../../providers/CalendarProvider";
+// import { useSupabase } from "../../providers/AuthContextProvider";
+// import { useCalendar } from "../../providers/CalendarProvider";
 import { CreateEventModal } from "../../components/CreateEventModal/CreateEventModal";
 
 export const DashboardComponent = ({ user }) => {
   const [athletes, setAthletes] = useState([]);
   const [eventModalOpen, setEventModalOpen] = useState(false);
-  const supabase = useSupabase();
-  const { getCalendars } = useCalendar();
+  // const supabase = useSupabase();
+  // const { getCalendars } = useCalendar();
 
   useEffect(() => {
     // TODO: handle calendar data
