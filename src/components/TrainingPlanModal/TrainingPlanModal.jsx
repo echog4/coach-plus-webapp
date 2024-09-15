@@ -6,7 +6,6 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle,
   Divider,
   IconButton,
@@ -158,14 +157,6 @@ export const TrainingPlanModal = ({
           </Typography>
         </DialogTitle>
         <DialogContent>
-          {!isUpdate && (
-            <DialogContentText>
-              Training plans are a way to organize your training schedule. You
-              can create Training Plans, add workouts to them, and assign them
-              to your athletes calendar.
-            </DialogContentText>
-          )}
-
           <Box sx={{ mb: 2, mt: 3 }}>
             <TextField {...register("name")} label="Plan Name" fullWidth />
           </Box>
@@ -177,6 +168,63 @@ export const TrainingPlanModal = ({
               multiline
               minRows={3}
             />
+          </Box>
+          <Box sx={{ mb: 2 }}>
+            <Typography sx={{ mb: 1 }}>Add Exercise</Typography>
+            <Box
+              sx={{
+                display: {
+                  xs: "block",
+                  sm: "flex",
+                },
+              }}
+            >
+              <Autocomplete
+                options={exercises}
+                sx={{
+                  mb: {
+                    xs: 2,
+                    sm: 0,
+                  },
+                  width: "100%",
+                }}
+                onChange={(e, v) =>
+                  v &&
+                  setSelectedExercises([
+                    ...selectedExercises,
+                    { ...v, order: selectedExercises.length + 1 },
+                  ])
+                }
+                renderInput={(params) => (
+                  <TextField {...params} label="Search Exercise" />
+                )}
+                getOptionLabel={(option) => option.title || ""}
+                renderOption={(props, option) => (
+                  <li {...props} key={option.id}>
+                    <Box
+                      display="flex"
+                      alignItems={"center"}
+                      sx={{ borderBottom: " 1px solid #ddd", width: "100%" }}
+                    >
+                      <Box display="flex" flexDirection="column" mr={1}>
+                        <Typography>{option.title}</Typography>
+                        <Typography variant="caption" mb={1}>
+                          {option.description}
+                        </Typography>
+                        <Typography variant="caption" mb={1}>
+                          <ExerciseUnits units={option.units} />
+                        </Typography>
+                      </Box>
+                      {option.images.length > 0 ? (
+                        <Box sx={previewStyle(option)}></Box>
+                      ) : option.videos.length > 0 ? (
+                        <Box sx={previewStyle(option, true)}></Box>
+                      ) : null}
+                    </Box>
+                  </li>
+                )}
+              />
+            </Box>
           </Box>
           <Box sx={{ mb: 2 }}>
             <List
@@ -239,63 +287,6 @@ export const TrainingPlanModal = ({
                   </React.Fragment>
                 ))}
             </List>
-          </Box>
-          <Box sx={{ mb: 2 }}>
-            <Typography sx={{ mb: 1 }}>Add Exercise</Typography>
-            <Box
-              sx={{
-                display: {
-                  xs: "block",
-                  sm: "flex",
-                },
-              }}
-            >
-              <Autocomplete
-                options={exercises}
-                sx={{
-                  mb: {
-                    xs: 2,
-                    sm: 0,
-                  },
-                  width: "100%",
-                }}
-                onChange={(e, v) =>
-                  v &&
-                  setSelectedExercises([
-                    ...selectedExercises,
-                    { ...v, order: selectedExercises.length + 1 },
-                  ])
-                }
-                renderInput={(params) => (
-                  <TextField {...params} label="Search Exercise" />
-                )}
-                getOptionLabel={(option) => option.title || ""}
-                renderOption={(props, option) => (
-                  <li {...props} key={option.id}>
-                    <Box
-                      display="flex"
-                      alignItems={"center"}
-                      sx={{ borderBottom: " 1px solid #ddd", width: "100%" }}
-                    >
-                      <Box display="flex" flexDirection="column" mr={1}>
-                        <Typography>{option.title}</Typography>
-                        <Typography variant="caption" mb={1}>
-                          {option.description}
-                        </Typography>
-                        <Typography variant="caption" mb={1}>
-                          <ExerciseUnits units={option.units} />
-                        </Typography>
-                      </Box>
-                      {option.images.length > 0 ? (
-                        <Box sx={previewStyle(option)}></Box>
-                      ) : option.videos.length > 0 ? (
-                        <Box sx={previewStyle(option, true)}></Box>
-                      ) : null}
-                    </Box>
-                  </li>
-                )}
-              />
-            </Box>
           </Box>
         </DialogContent>
         <DialogActions>
