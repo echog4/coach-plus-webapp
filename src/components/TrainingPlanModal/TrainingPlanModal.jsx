@@ -251,7 +251,6 @@ export const TrainingPlanModal = ({
               }}
             >
               <Autocomplete
-                disablePortal
                 options={exercises}
                 sx={{
                   mb: {

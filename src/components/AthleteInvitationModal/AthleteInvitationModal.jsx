@@ -128,7 +128,6 @@ export default function AthleteInviteModal({ open, handleClose, onSuccess }) {
         </Box>
         <Box mb={3}>
           <Autocomplete
-            disablePortal
             options={forms}
             sx={{
               width: "100%",

@@ -127,7 +127,6 @@ export const CreateEventModal = ({
           <>
             <Box mb={3} pt={2}>
               <Autocomplete
-                disablePortal
                 options={athletes}
                 sx={{
                   width: "100%",
@@ -155,7 +154,6 @@ export const CreateEventModal = ({
 
             <Box mb={3}>
               <Autocomplete
-                disablePortal
                 options={plans}
                 sx={{
                   width: "100%",
