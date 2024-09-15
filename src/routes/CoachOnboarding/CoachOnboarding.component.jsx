@@ -11,7 +11,7 @@ import {
 import { PageContainer } from "../../components/PageContainer/PageContainer";
 import React from "react";
 import { Controller, useForm } from "react-hook-form";
-import { DateField } from "@mui/x-date-pickers";
+import { DateField, MobileDatePicker } from "@mui/x-date-pickers";
 import { useAuth, useSupabase } from "../../providers/AuthContextProvider";
 import { Navigate } from "react-router-dom";
 import { updateCoach } from "../../services/query";
@@ -55,7 +55,7 @@ export const CoachOnboardingComponent = () => {
     setActiveStep(0);
   };
 
-  if (user.onboarded_at) {
+  if (user && user.onboarded_at) {
     return <Navigate to="/" />;
   }
 
@@ -141,13 +141,14 @@ const PersonalInfo = ({ register, control }) => (
         rules={{ required: true }}
         render={({ field }) => {
           return (
-            <DateField
+            <MobileDatePicker
               label="Date of Birth"
               value={field.value}
               inputRef={field.ref}
               onChange={(date) => {
                 field.onChange(date);
               }}
+              fullWidth
             />
           );
         }}

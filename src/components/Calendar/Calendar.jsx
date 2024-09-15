@@ -170,7 +170,7 @@ export const CalendarComponent = ({
               views={views || ["month", "week", "day", "agenda"]}
             />
           ) : (
-            <Progress />
+            <span>No Calendar</span>
           )}
         </Box>
       </Paper>
