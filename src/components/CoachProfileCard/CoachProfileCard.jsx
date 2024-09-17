@@ -1,17 +1,8 @@
-import {
-  Avatar,
-  Box,
-  Button,
-  Chip,
-  IconButton,
-  Paper,
-  Typography,
-} from "@mui/material";
+import { Avatar, Box, Button, Chip, Paper, Typography } from "@mui/material";
 import {
   Edit,
   Face,
   LocationOn,
-  NotificationImportant,
   Numbers,
   SportsBaseball,
 } from "@mui/icons-material";

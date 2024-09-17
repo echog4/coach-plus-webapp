@@ -5,7 +5,6 @@ import Typography from "@mui/material/Typography";
 import { Menu as MenuIcon, SportsGymnastics } from "@mui/icons-material";
 import { Avatar, IconButton, Menu, MenuItem } from "@mui/material";
 import { useAuth } from "../../providers/AuthContextProvider";
-import { NotificationArea } from "../NotificationArea/NotificationArea";
 
 const UserMenu = ({ user, signOut, anchorEl, handleOpen, handleClose }) => (
   <div>
