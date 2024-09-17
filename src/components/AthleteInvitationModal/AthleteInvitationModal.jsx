@@ -27,8 +27,8 @@ export default function AthleteInviteModal({ open, handleClose, onSuccess }) {
 
   const handleInvite = async () => {
     setLoading(true);
-    if (!email || !email.endsWith("@gmail.com")) {
-      return alert("Please enter a Gmail address");
+    if (!email || !email.match(/^[^@]+@[^@]+\.[^@]+$/)) {
+      return alert("Please enter a valid Gmail address");
     }
     if (!selectedForm) {
       return alert("Please select an onboarding form");
