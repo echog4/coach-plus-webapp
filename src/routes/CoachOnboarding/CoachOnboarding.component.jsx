@@ -28,17 +28,18 @@ export const CoachOnboardingComponent = () => {
   const supabase = useSupabase();
 
   const onSubmit = handleSubmit(async (data) => {
-    await updateCoach(
-      supabase,
-      {
-        ...data,
-        email: sessionUser.email,
-        status: "ACTIVE",
-        onboarded_at: new Date().toISOString(),
-        full_name: `${data.first_name} ${data.last_name}`,
-      },
-      sessionUser.id
-    );
+    const payload = {
+      ...data,
+      phone_number: `+ ${data.area_code} ${data.phone_number}`,
+      email: sessionUser.email,
+      status: "ACTIVE",
+      onboarded_at: new Date().toISOString(),
+      full_name: `${data.first_name} ${data.last_name}`,
+    };
+
+    delete payload.area_code;
+
+    await updateCoach(supabase, payload, sessionUser.id);
 
     await syncUser(session);
   });
@@ -175,11 +176,19 @@ const LocationAndContact = ({ register, email }) => (
       <TextField {...register("country")} label="Country" fullWidth />
     </Box>
 
-    <Box sx={{ maxWidth: 400, mb: 3 }}>
+    <Box sx={{ maxWidth: 400, mb: 3 }} display="flex" alignItems="center">
+      <Typography sx={{ mr: 1 }}>+</Typography>
+      <TextField
+        {...register("area_code")}
+        label="Area Code"
+        type="number"
+        fullWidth
+        sx={{ mr: 1, width: 120 }}
+      />
       <TextField
         {...register("phone_number")}
         label="Phone Number"
-        type="text"
+        type="number"
         fullWidth
       />
     </Box>
