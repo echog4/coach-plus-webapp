@@ -195,7 +195,7 @@ export const AthleteRoute = () => {
   const [createCalendarLoading, setCreateCalendarLoading] = useState(false);
   const [eventModalOpen, setEventModalOpen] = useState(false);
 
-  const [editModal, setEditModal] = useState(true);
+  const [editModal, setEditModal] = useState(false);
 
   const reloadCalendars = () =>
     getCalendarsByCoachIdAthleteId(supabase, user.id, params.id).then(

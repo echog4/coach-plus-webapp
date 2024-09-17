@@ -40,7 +40,6 @@ export const CreateEventModal = ({
   const supabase = useSupabase();
   const { user } = useAuth();
   const { createEvent } = useCalendar();
-
   useEffect(() => {
     if (!user) {
       return;
@@ -74,10 +73,15 @@ export const CreateEventModal = ({
     const sb_start = getSQLDate(eventDate);
     const start = format(eventDate, "yyyy-MM-dd");
     const end = format(addDays(eventDate, 1), "yyyy-MM-dd");
+
     // Create google calendar event
     const gcal_payload = {
       summary: `C+ ${getAthleteName(selectedAthlete)} - ${selectedPlan.name}`,
-      description: renderGCalDescription(selectedPlan),
+      description: renderGCalDescription(
+        selectedPlan,
+        selectedAthlete.email,
+        selectedPlan.id
+      ),
       start: {
         date: start,
         timeZone: getTimeZone(),
@@ -97,6 +101,7 @@ export const CreateEventModal = ({
       },
     };
     const gcal_event = await createEvent(gcal_id, gcal_payload);
+
     // Create supabase event
     const sb_event = {
       date: sb_start,
@@ -107,6 +112,7 @@ export const CreateEventModal = ({
       athlete_id: selectedAthlete.id,
       plan_id: selectedPlan.id,
     };
+
     await insertEvent(supabase, sb_event);
 
     setLoading(false);

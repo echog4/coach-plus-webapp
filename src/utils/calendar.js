@@ -4,14 +4,15 @@
 // };
 
 import { format, formatDistanceToNow, parse } from "date-fns";
+import { getTPURLId } from "./bas64";
 
 // TODO: change base URL
-export const renderGCalDescription = ({
-  id,
-  name,
-  overview,
-}) => `<p><strong>${name}</strong></p><p>${overview}</p>
-<a href="https://coach-plus-ui.vercel.app/tp/${id}">View training plan</a>
+export const renderGCalDescription = ({ name, overview }, email, id) =>
+  `<p><strong>${name}</strong></p><p>${overview}</p>
+<a href="${window.location.href}tp/${getTPURLId(
+    email,
+    id
+  )}">View training plan</a>
 `;
 
 export const getTimeZone = () =>

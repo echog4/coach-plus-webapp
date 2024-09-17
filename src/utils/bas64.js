@@ -18,3 +18,18 @@ export const objectDecodeBase64 = (base64String) => {
 
   return obj;
 };
+
+export const getTPURLId = (email, id) => {
+  const obj = {
+    email,
+    id,
+  };
+
+  return encodeURIComponent(objectEncodeBase64(obj));
+};
+
+export const decodeTPURLId = (tpURLId) => {
+  return objectDecodeBase64(decodeURIComponent(tpURLId));
+};
+
+window.getTPURLId = getTPURLId;

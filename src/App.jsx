@@ -20,6 +20,7 @@ import { OnboardingFormDisplayRoute } from "./routes/OnboardingFormDisplay/Onboa
 import { TrainingPlanRoute } from "./routes/TrainingPlan/TrainingPlan.route";
 import { PATH_COACH_ONBOARDING } from "./utils/constant";
 import { AccountSettings } from "./routes/Account settings/AccountSettings";
+import { TPDisplay } from "./components/TPDisplay/TPDisplay";
 
 function App() {
   const [drawerOpen, setDrawerOpen] = React.useState(false);
@@ -108,7 +109,7 @@ function App() {
               path="/onboarding-form/:id"
               element={<OnboardingFormDisplayRoute />}
             />
-
+            <Route path="/tp/:bid" element={<TPDisplay />} />
             <Route path="/login" element={<LoginRoute />} />
             <Route
               path="/settings"

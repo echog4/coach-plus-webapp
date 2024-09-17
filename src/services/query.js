@@ -109,6 +109,13 @@ export const getExercisesByCoachId = async (supabase, coach_id) =>
     .eq("coach_id", coach_id)
     .is("deleted_at", null);
 
+export const getPlanByIdPublic = async (supabase, id, email) =>
+  await supabase
+    .from("plans")
+    .select("*, exercise_plans(*, exercises(*))")
+    .eq("id", id)
+    .is("deleted_at", null);
+
 export const getPlansByCoachId = async (supabase, coach_id) =>
   await supabase
     .from("plans")
