@@ -25,12 +25,7 @@ export const CoachProfileCard = ({ user, athletes }) => (
         alignItems="center"
         mb={3}
       >
-        <Typography variant="subtitle1">
-          Welcome, Coach! You have <strong>4</strong> new updates{" "}
-        </Typography>
-        <IconButton size="small" sx={{ marginRight: "auto", marginLeft: 1 }}>
-          <NotificationImportant />
-        </IconButton>
+        <Typography variant="subtitle1">Welcome, Coach!</Typography>
         <Button
           color="primary"
           startIcon={<Edit />}

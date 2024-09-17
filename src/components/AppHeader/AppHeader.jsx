@@ -86,7 +86,6 @@ export const AppHeader = ({ handleDrawerToggle }) => {
         </Typography>
         {session && (
           <>
-            <NotificationArea />
             <UserMenu
               user={sessionUser}
               signOut={signOut}

@@ -5,7 +5,6 @@ import { getPlanByIdPublic } from "../../services/query";
 import { PageContainer } from "../PageContainer/PageContainer";
 import { Box, Divider, Typography } from "@mui/material";
 import { decodeTPURLId } from "../../utils/bas64";
-import { GetAthleteStatus } from "../AthletesTable/AthletesTable";
 import { ExerciseUnits } from "../TrainingPlanModal/TrainingPlanModal";
 
 export const TPDisplay = () => {
@@ -15,7 +14,7 @@ export const TPDisplay = () => {
 
   const fetchPlan = async () => {
     const { email, id } = decodeTPURLId(bid);
-    const { data: plan, error } = await getPlanByIdPublic(supabase, id, email);
+    const { data: plan } = await getPlanByIdPublic(supabase, id, email);
     console.log({ plan });
     setPlan(plan[0]);
   };
