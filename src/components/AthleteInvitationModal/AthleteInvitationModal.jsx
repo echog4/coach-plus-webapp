@@ -45,7 +45,7 @@ export default function AthleteInviteModal({ open, handleClose, onSuccess }) {
     if (existingAthlete.length > 0) {
       athlete = existingAthlete[0];
     } else {
-      const { data: newAthlete } = await insertAthlete(supabase, [athlete]);
+      const { data: newAthlete } = await insertAthlete(supabase, athlete);
       if (newAthlete) {
         athlete = newAthlete[0];
       }
@@ -55,14 +55,12 @@ export default function AthleteInviteModal({ open, handleClose, onSuccess }) {
 
     // create "onboarding_form_response"
     const { data: newResponse, error: newResponseError } =
-      await insertOnboardingFormResponse(supabase, [
-        {
-          athlete_id: athlete.id,
-          coach_id: user.id,
-          form_id: selectedForm.id,
-          status: "sent",
-        },
-      ]);
+      await insertOnboardingFormResponse(supabase, {
+        athlete_id: athlete.id,
+        coach_id: user.id,
+        form_id: selectedForm.id,
+        status: "sent",
+      });
 
     console.log({ newResponse, newResponseError });
 
