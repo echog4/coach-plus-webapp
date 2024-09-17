@@ -19,6 +19,7 @@ import { OnboardingFormsRoute } from "./routes/OnboardingForms/OnboardingForms.r
 import { OnboardingFormDisplayRoute } from "./routes/OnboardingFormDisplay/OnboardingFormDisplay.route";
 import { TrainingPlanRoute } from "./routes/TrainingPlan/TrainingPlan.route";
 import { PATH_COACH_ONBOARDING } from "./utils/constant";
+import { AccountSettings } from "./routes/Account settings/AccountSettings";
 
 function App() {
   const [drawerOpen, setDrawerOpen] = React.useState(false);
@@ -109,6 +110,14 @@ function App() {
             />
 
             <Route path="/login" element={<LoginRoute />} />
+            <Route
+              path="/settings"
+              element={
+                <ProtectedRoute>
+                  <AccountSettings />
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="*"
               element={

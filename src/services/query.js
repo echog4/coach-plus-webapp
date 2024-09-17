@@ -1,6 +1,9 @@
 // COACH
 // COACH
 // COACH
+export const getCoachById = async (supabase, id) =>
+  await supabase.from("users").select().eq("id", id);
+
 export const updateCoach = async (supabase, user, user_id) =>
   await supabase.from("users").update(user).eq("id", user_id);
 
