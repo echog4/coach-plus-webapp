@@ -45,6 +45,9 @@ export const CalendarComponent = () => {
         onNewEventClick={() => {
           setEventModalOpen(true);
         }}
+        onEventDelete={() => {
+          reloadCalendars();
+        }}
         onCalendarToggle={async (calendarId) => {
           if (toggling) {
             return;

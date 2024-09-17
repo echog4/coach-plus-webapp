@@ -21,6 +21,9 @@ import { AlarmAdd, CalendarMonth } from "@mui/icons-material";
 import { endOfDay, startOfDay, startOfMonth } from "date-fns";
 import { useEffect, useState } from "react";
 import { getReadableTextColor } from "../../utils/styles/theme";
+import { deleteSBEvent } from "../../services/query";
+import { supabase } from "../../services/supabase";
+import { useCalendar } from "../../providers/CalendarProvider";
 
 const locales = {
   "en-US": enUS,
@@ -44,11 +47,19 @@ export const CalendarComponent = ({
   onNewEventClick,
   onEventSelect,
   onReloadRequest,
-  onEventDelete,
+  onEventDelete = () => null,
   onCalendarToggle,
 }) => {
   const [events, setEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const { deleteEvent } = useCalendar();
+
+  const deleteCEvent = async (calId, evId, gc_id) => {
+    await deleteEvent(calId, gc_id);
+    await deleteSBEvent(supabase, evId);
+
+    onEventDelete(calId, evId);
+  };
 
   useEffect(() => {
     if (!calendars || calendars.length === 0) {
@@ -63,6 +74,8 @@ export const CalendarComponent = ({
           resource: e.payload,
           start: startOfDay(e.date),
           end: endOfDay(e.date),
+          id: e.id,
+          calendarId: cal.payload.calendarId,
           title: e.payload.summary,
           backgroundColor: cal.payload.color,
           foregroundColor: getReadableTextColor(cal.payload.color),
@@ -80,10 +93,11 @@ export const CalendarComponent = ({
           event={selectedEvent}
           open={!!selectedEvent}
           onClose={() => setSelectedEvent(null)}
-          onDelete={(calId, evId) => {
+          onDelete={(calId, gcalEvId, evId) => {
             if (window.confirm("Are you sure you want to delete this event?")) {
+              deleteCEvent(calId, evId, gcalEvId);
               setSelectedEvent(null);
-              onEventDelete(calId, evId);
+              onEventDelete(calId, evId, gcalEvId);
             }
           }}
         />
@@ -189,7 +203,9 @@ const EventModal = ({ event, onClose, open, onDelete }) => {
       </DialogContent>
       <DialogActions>
         <Button
-          onClick={() => onDelete(event.calendarId, event.resource.id)}
+          onClick={() =>
+            onDelete(event.calendarId, event.resource.id, event.id)
+          }
           color="error"
         >
           Delete Event

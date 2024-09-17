@@ -3,7 +3,7 @@
 //   return `${name} - ${sets}x${reps} ${weight}${unit}`;
 // };
 
-import { formatDistanceToNow, parse } from "date-fns";
+import { format, formatDistanceToNow, parse } from "date-fns";
 
 // TODO: change base URL
 export const renderGCalDescription = ({
@@ -22,5 +22,4 @@ export const getDistanceText = (date) => {
   return formatDistanceToNow(the_date, { addSuffix: true });
 };
 
-export const getSQLDate = (date) =>
-  `${date.getYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+export const getSQLDate = (date) => format(date, "yyyy-MM-dd");

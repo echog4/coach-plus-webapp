@@ -74,7 +74,6 @@ export const CreateEventModal = ({
     const sb_start = getSQLDate(eventDate);
     const start = format(eventDate, "yyyy-MM-dd");
     const end = format(addDays(eventDate, 1), "yyyy-MM-dd");
-
     // Create google calendar event
     const gcal_payload = {
       summary: `C+ ${getAthleteName(selectedAthlete)} - ${selectedPlan.name}`,

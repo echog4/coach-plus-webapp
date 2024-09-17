@@ -523,6 +523,9 @@ export const AthleteRoute = () => {
                     setEventModalOpen(true);
                   }}
                   onCalendarToggle={noop}
+                  onEventDelete={() => {
+                    reloadCalendars();
+                  }}
                 />
               )}
             </Grid2>

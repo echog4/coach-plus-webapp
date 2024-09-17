@@ -58,6 +58,9 @@ export const DashboardComponent = ({ user }) => {
             onNewEventClick={() => {
               setEventModalOpen(true);
             }}
+            onEventDelete={() => {
+              reloadCalendars();
+            }}
           />
         </Grid2>
         <Grid2 xs={12} sm={6} md={6}>

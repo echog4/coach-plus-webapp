@@ -190,5 +190,5 @@ export const getEventsByCoachIdAthleteId = async (
 export const insertEvent = async (supabase, event) =>
   await supabase.from("events").insert(event).select();
 
-export const deleteEvent = async (supabase, id) =>
-  await supabase.from("events").update({ deleted_at: new Date() }).eq("id", id);
+export const deleteSBEvent = async (supabase, id) =>
+  await supabase.from("events").delete().eq("id", id);
