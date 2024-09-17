@@ -31,7 +31,12 @@ export const CoachProfileCard = ({ user, athletes }) => (
         <IconButton size="small" sx={{ marginRight: "auto", marginLeft: 1 }}>
           <NotificationImportant />
         </IconButton>
-        <Button color="primary" startIcon={<Edit />} size="small">
+        <Button
+          color="primary"
+          startIcon={<Edit />}
+          size="small"
+          href="/settings"
+        >
           Edit Info
         </Button>
       </Box>

@@ -24,7 +24,11 @@ export const AccountSettings = () => {
   };
 
   const onSubmit = handleSubmit((data) => {
-    updateCoach(supabase, data, user.id);
+    updateCoach(
+      supabase,
+      { ...data, full_name: `${data.first_name} ${data.last_name}` },
+      user.id
+    );
     console.log(data);
   });
 

@@ -12,6 +12,7 @@ import {
   ListItemText,
   ListSubheader,
   Paper,
+  TextField,
   Typography,
 } from "@mui/material";
 import { PageContainer } from "../../components/PageContainer/PageContainer";
@@ -20,6 +21,7 @@ import {
   Cancel,
   CheckCircle,
   Close,
+  Edit,
   Mail,
   Phone,
   WarningRounded,
@@ -36,11 +38,150 @@ import {
   getAthleteProfile,
   getCalendarsByCoachIdAthleteId,
   insertCalendar,
+  upsertAthlete,
 } from "../../services/query";
 import { getTimeZone } from "../../utils/calendar";
 import { CreateEventModal } from "../../components/CreateEventModal/CreateEventModal";
 import { noop } from "../../utils/noop";
 import { GetAthleteStatus } from "../../components/AthletesTable/AthletesTable";
+import { Controller, useForm } from "react-hook-form";
+import { MobileDatePicker } from "@mui/x-date-pickers";
+
+const EditModal = ({ editModalOpen, setEditModalOpen, athlete, onSuccess }) => {
+  const { register, handleSubmit, control } = useForm({
+    defaultValues: {
+      first_name: athlete.first_name,
+      last_name: athlete.last_name,
+      city: athlete.city,
+      country: athlete.country,
+      phone_number: athlete.phone_number,
+      dob: new Date(athlete.dob),
+    },
+  });
+
+  const supabase = useSupabase();
+
+  const onSubmit = handleSubmit(async (data) => {
+    await upsertAthlete(supabase, {
+      id: athlete.id,
+      first_name: data.first_name,
+      last_name: data.last_name,
+      full_name: `${data.first_name} ${data.last_name}`,
+      city: data.city,
+      country: data.country,
+      phone_number: data.phone_number,
+      dob: data.dob,
+    });
+    setEditModalOpen(false);
+    onSuccess && onSuccess();
+  });
+  return (
+    <Dialog
+      onClose={() => setEditModalOpen(false)}
+      aria-labelledby="customized-dialog-title"
+      open={editModalOpen}
+      fullWidth
+    >
+      <DialogTitle sx={{ m: 0, p: 2 }} id="customized-dialog-title">
+        Edit Athlete
+      </DialogTitle>
+      <IconButton
+        aria-label="close"
+        onClick={() => setEditModalOpen(false)}
+        sx={{
+          position: "absolute",
+          right: 8,
+          top: 8,
+          color: (theme) => theme.palette.grey[500],
+        }}
+      >
+        <Close />
+      </IconButton>
+      <DialogContent>
+        <form onSubmit={onSubmit}>
+          <Box sx={{ mt: 2 }}>
+            <TextField
+              {...register("first_name")}
+              label="First Name"
+              fullWidth
+              required
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+          </Box>
+          <Box sx={{ mt: 2 }}>
+            <TextField
+              {...register("last_name")}
+              label="Last Name"
+              fullWidth
+              required
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+          </Box>
+          <Box sx={{ mt: 2 }}>
+            <TextField
+              {...register("city")}
+              label="City"
+              fullWidth
+              required
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+          </Box>
+          <Box sx={{ mt: 2 }}>
+            <TextField
+              {...register("country")}
+              label="Country"
+              fullWidth
+              required
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+          </Box>
+          <Box sx={{ mt: 2 }}>
+            <TextField
+              {...register("phone_number")}
+              label="Phone Number"
+              fullWidth
+              required
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+          </Box>
+          <Box sx={{ maxWidth: 400, mt: 2, mb: 2 }}>
+            <Controller
+              control={control}
+              name="dob"
+              rules={{ required: true }}
+              render={({ field }) => {
+                console.log({ field });
+                return (
+                  <MobileDatePicker
+                    label="Date of Birth"
+                    format="yyyy-MM-dd"
+                    value={field.value && new Date(field.value)}
+                    inputRef={field.ref}
+                    onChange={(date) => {
+                      field.onChange(date);
+                    }}
+                    fullWidth
+                  />
+                );
+              }}
+            />
+          </Box>
+          <Button type="submit">Submit</Button>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+};
 
 export const AthleteRoute = () => {
   const [open, setOpen] = useState(false);
@@ -53,6 +194,8 @@ export const AthleteRoute = () => {
   const { createCalendar, getCalendar, gapiInited } = useCalendar();
   const [createCalendarLoading, setCreateCalendarLoading] = useState(false);
   const [eventModalOpen, setEventModalOpen] = useState(false);
+
+  const [editModal, setEditModal] = useState(true);
 
   const reloadCalendars = () =>
     getCalendarsByCoachIdAthleteId(supabase, user.id, params.id).then(
@@ -104,6 +247,7 @@ export const AthleteRoute = () => {
 
   const fetchAthlete = async () => {
     const { data: athletes } = await getAthleteProfile(supabase, params.id);
+    console.log(athletes[0]);
     setAthlete(athletes[0]);
   };
 
@@ -131,6 +275,14 @@ export const AthleteRoute = () => {
             reloadCalendars();
           }}
           athleteId={params.id}
+        />
+      )}
+      {editModal && (
+        <EditModal
+          editModalOpen={editModal}
+          setEditModalOpen={setEditModal}
+          athlete={athlete}
+          onSuccess={() => fetchAthlete()}
         />
       )}
       <Dialog
@@ -198,6 +350,9 @@ export const AthleteRoute = () => {
               </IconButton>
               <IconButton size="small" href={`mailto:${athlete.email}`}>
                 <Mail />
+              </IconButton>
+              <IconButton size="small" onClick={() => setEditModal(true)}>
+                <Edit />
               </IconButton>
             </Box>
 
