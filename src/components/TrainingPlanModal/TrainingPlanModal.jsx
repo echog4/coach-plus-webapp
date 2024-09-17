@@ -188,6 +188,11 @@ export const TrainingPlanModal = ({
                   },
                   width: "100%",
                 }}
+                componentsProps={{
+                  popper: {
+                    placement: "top-end",
+                  },
+                }}
                 onChange={(e, v) =>
                   v &&
                   setSelectedExercises([
