@@ -12,6 +12,7 @@ export const AuthContextProvider = ({ children, supabase }) => {
     LSN_SESSION_KEY,
     null
   );
+
   const [session, setSession] = useState(null);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -30,6 +31,7 @@ export const AuthContextProvider = ({ children, supabase }) => {
   };
 
   const syncUser = async (session) => {
+    console.log({ session });
     const { data: existing_user, error } = await supabase
       .from("users")
       .select("*")
@@ -40,6 +42,12 @@ export const AuthContextProvider = ({ children, supabase }) => {
     }
 
     if (existing_user.length === 1) {
+      await supabase
+        .from("users")
+        .update({
+          google_refresh_token: session.provider_refresh_token,
+        })
+        .eq("id", session.user.id);
       return setUser({
         ...existing_user[0],
         sessionUser: session && session.user,
@@ -52,8 +60,8 @@ export const AuthContextProvider = ({ children, supabase }) => {
         id: session.user.id,
         full_name: session.user.user_metadata.full_name,
         type: "coach",
-        google_access_token: localSession.provider_token,
-        google_refresh_token: localSession.refresh_token,
+        google_access_token: session.provider_token,
+        google_refresh_token: session.provider_refresh_token,
       })
       .select()
       .single();
@@ -69,6 +77,9 @@ export const AuthContextProvider = ({ children, supabase }) => {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       _setSession(session);
+      if (_event === "SIGNED_IN") {
+        syncUser(session);
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -122,11 +133,10 @@ export const AuthContextProvider = ({ children, supabase }) => {
       if (error) {
         throw error;
       }
+
       _setSession(session);
     },
-    refreshGoogleToken: async () => {
-      tokenClient.requestAccessToken();
-    },
+
     signOut: async () => {
       const { error } = await supabase.auth.signOut();
 
