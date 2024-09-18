@@ -17,15 +17,7 @@ import {
 } from "@mui/material";
 import { PageContainer } from "../../components/PageContainer/PageContainer";
 import Grid2 from "@mui/material/Unstable_Grid2/Grid2";
-import {
-  Cancel,
-  CheckCircle,
-  Close,
-  Edit,
-  Mail,
-  Phone,
-  WarningRounded,
-} from "@mui/icons-material";
+import { Close, Edit, Mail, Phone, WarningRounded } from "@mui/icons-material";
 import { LineChart } from "@mui/x-charts";
 import React, { useEffect, useState } from "react";
 import { useAuth, useSupabase } from "../../providers/AuthContextProvider";
@@ -288,10 +280,10 @@ export const AthleteRoute = () => {
       <Dialog
         onClose={() => setOpen(false)}
         aria-labelledby="customized-dialog-title"
-        open={open}
+        open={!!open}
       >
         <DialogTitle sx={{ m: 0, p: 2 }} id="customized-dialog-title">
-          Feedback for 29 June 2024
+          Feedback for {new Date(open?.created_at).toLocaleDateString()}
         </DialogTitle>
         <IconButton
           aria-label="close"
@@ -307,19 +299,7 @@ export const AthleteRoute = () => {
         </IconButton>
         <DialogContent dividers>
           <Typography gutterBottom>
-            Cras mattis consectetur purus sit amet fermentum. Cras justo odio,
-            dapibus ac facilisis in, egestas eget quam. Morbi leo risus, porta
-            ac consectetur ac, vestibulum at eros.
-          </Typography>
-          <Typography gutterBottom>
-            Praesent commodo cursus magna, vel scelerisque nisl consectetur et.
-            Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor
-            auctor.
-          </Typography>
-          <Typography gutterBottom>
-            Aenean lacinia bibendum nulla sed consectetur. Praesent commodo
-            cursus magna, vel scelerisque nisl consectetur et. Donec sed odio
-            dui. Donec ullamcorper nulla non metus auctor fringilla.
+            {open?.feedback || "No feedback provided"}
           </Typography>
         </DialogContent>
       </Dialog>
@@ -361,15 +341,7 @@ export const AthleteRoute = () => {
                 <Typography variant="subtitle2">
                   <Box display="flex" alignItems="center" mb={3}>
                     {athlete.events[0] ? (
-                      <>
-                        <CheckCircle
-                          color="success"
-                          sx={{ mr: 1, height: 26, width: "auto" }}
-                        />
-                        {/* TODO: add next session in days */}
-                        {getAthleteName(athlete)} has an upcoming session in 2
-                        days!
-                      </>
+                      <></>
                     ) : (
                       <>
                         <WarningRounded
@@ -425,22 +397,6 @@ export const AthleteRoute = () => {
                       {athlete.onboarding_form_response[0].weight} kg
                     </Typography>
                   </Box>
-                  <Box mr={4}>
-                    <Typography variant="subtitle2" mb={2}>
-                      Last 5 check-ins:
-                    </Typography>
-                    <Box display="flex" mb={2}>
-                      {[1, 1, 0, 0, 1].map((a, i) => (
-                        <Box key={i} sx={{ mr: 1 }}>
-                          {a === 1 ? (
-                            <CheckCircle color="success" />
-                          ) : (
-                            <Cancel color="warning" />
-                          )}
-                        </Box>
-                      ))}
-                    </Box>
-                  </Box>
                   {false && (
                     <Box>
                       <Typography variant="subtitle2" mb={0.5}>
@@ -491,16 +447,17 @@ export const AthleteRoute = () => {
                       width: "100%",
                       bgcolor: "background.paper",
                     }}
-                    subheader={<ListSubheader>Check-ins</ListSubheader>}
+                    subheader={<ListSubheader>Last 10 Check-ins</ListSubheader>}
                   >
                     {/* TODO Implement check-ins */}
-                    {Array.from({ length: 8 }).map((a, i) => (
+                    {athlete.check_ins.map((c, i) => (
                       <React.Fragment key={i}>
                         <ListItemButton>
                           <ListItemText
-                            onClick={() => setOpen(true)}
-                            primary="Sent a new feedback. Click here to see it"
-                            secondary="Jan 9, 2014"
+                            primary={`New feedback on ${new Date(
+                              c.created_at
+                            ).toLocaleDateString()}`}
+                            secondary={c.feedback}
                           />
                         </ListItemButton>
                         <Divider />

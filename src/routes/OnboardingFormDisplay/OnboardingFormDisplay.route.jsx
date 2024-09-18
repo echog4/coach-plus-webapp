@@ -37,8 +37,6 @@ export const OnboardingFormDisplayRoute = () => {
       city,
       country,
       dob,
-      area_code,
-      phone_number,
       height,
       weight,
       custom,
@@ -51,7 +49,6 @@ export const OnboardingFormDisplayRoute = () => {
         city,
         country,
         dob,
-        phone_number: `+${area_code} ${phone_number}`,
         status: "VERIFIED",
       };
 
@@ -129,22 +126,6 @@ export const OnboardingFormDisplayRoute = () => {
                 fullWidth
                 error={errors.last_name}
                 helperText={errors.last_name ? "This field is required" : ""}
-              />
-            </Box>
-            <Box sx={{ mb: 3 }} display="flex" alignItems="center">
-              <Typography sx={{ mr: 1 }}>+</Typography>
-              <TextField
-                {...register("area_code")}
-                label="Area Code"
-                type="number"
-                fullWidth
-                sx={{ mr: 1, width: 120 }}
-              />
-              <TextField
-                {...register("phone_number")}
-                label="Phone Number"
-                type="number"
-                fullWidth
               />
             </Box>
             <Box sx={{ mb: 3 }}>

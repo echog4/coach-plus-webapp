@@ -15,6 +15,7 @@ import { MobileDatePicker } from "@mui/x-date-pickers";
 import { useAuth, useSupabase } from "../../providers/AuthContextProvider";
 import { Navigate } from "react-router-dom";
 import { updateCoach } from "../../services/query";
+import { trimAndValidatePhone } from "../../utils/validations";
 const steps = [
   "Personal Information",
   "Location and Contact",
@@ -28,9 +29,17 @@ export const CoachOnboardingComponent = () => {
   const supabase = useSupabase();
 
   const onSubmit = handleSubmit(async (data) => {
+    const trimedPhoneNumber = trimAndValidatePhone(
+      `${data.area_code}${data.phone_number}`
+    );
+    if (!trimedPhoneNumber) {
+      return alert(
+        "Please enter a valid phone number consisting of digits only"
+      );
+    }
     const payload = {
       ...data,
-      phone_number: `+ ${data.area_code} ${data.phone_number}`,
+      phone_number: trimedPhoneNumber,
       email: sessionUser.email,
       status: "ACTIVE",
       onboarded_at: new Date().toISOString(),
@@ -180,7 +189,7 @@ const LocationAndContact = ({ register, email }) => (
       <Typography sx={{ mr: 1 }}>+</Typography>
       <TextField
         {...register("area_code")}
-        label="Area Code"
+        label="Country Code"
         type="number"
         fullWidth
         sx={{ mr: 1, width: 120 }}

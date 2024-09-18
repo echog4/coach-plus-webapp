@@ -13,7 +13,7 @@ export const CalendarProvider = ({ children }) => {
   const supabase = useSupabase();
 
   const { localSession } = useAuth();
-  const [gapiTime, setGapiTime] = useLocalStorage("gapiTime", Date.now());
+  const [gapiTime, setGapiTime] = useLocalStorage("gapiTime", 1);
 
   useEffect(() => {
     const initializeGapiClient = async () => {
@@ -51,11 +51,14 @@ export const CalendarProvider = ({ children }) => {
       );
     },
 
-    refreshGoogleToken: async () => {
-      if (Date.now() - gapiTime < 2700000) {
-        console.log("token still valid");
-        return;
+    refreshGoogleToken: async (force) => {
+      if (!force) {
+        if (Date.now() - gapiTime < 2700000) {
+          console.log("token still valid");
+          return;
+        }
       }
+
       console.log("refreshing token");
       setGapiInited(false);
       setGapiTime(Date.now());
@@ -69,7 +72,7 @@ export const CalendarProvider = ({ children }) => {
     },
 
     getCalendar: async (calendarId, events = false) => {
-      await window.calendarContextValue.refreshGoogleToken();
+      await window.calendarContextValue.refreshGoogleToken(true);
       const clResponse = await gapi.client.calendar.calendarList.get({
         calendarId: calendarId,
       });
@@ -99,7 +102,7 @@ export const CalendarProvider = ({ children }) => {
       };
     },
     getCalendars: async (filter) => {
-      await window.calendarContextValue.refreshGoogleToken();
+      await window.calendarContextValue.refreshGoogleToken(true);
       const response = await gapi.client.calendar.calendarList.list();
       const cals = await Promise.all(
         response.result.items
@@ -148,7 +151,7 @@ export const CalendarProvider = ({ children }) => {
         }));
     },
     createCalendar: async (calendar) => {
-      await window.calendarContextValue.refreshGoogleToken();
+      await window.calendarContextValue.refreshGoogleToken(true);
       const request = {
         resource: calendar,
       };
@@ -156,7 +159,7 @@ export const CalendarProvider = ({ children }) => {
       return response.result;
     },
     getEvents: async (calId, startTime) => {
-      await window.calendarContextValue.refreshGoogleToken();
+      await window.calendarContextValue.refreshGoogleToken(true);
       const st = startTime || startOfMonth(new Date());
 
       const request = {
@@ -184,7 +187,7 @@ export const CalendarProvider = ({ children }) => {
       });
     },
     createEvent: async (calendarId, event) => {
-      await window.calendarContextValue.refreshGoogleToken();
+      await window.calendarContextValue.refreshGoogleToken(true);
       const request = {
         calendarId: calendarId,
         resource: event,
@@ -192,7 +195,7 @@ export const CalendarProvider = ({ children }) => {
       return (await gapi.client.calendar.events.insert(request)).result;
     },
     deleteEvent: async (calendarId, eventId) => {
-      await window.calendarContextValue.refreshGoogleToken();
+      await window.calendarContextValue.refreshGoogleToken(true);
       const request = {
         calendarId: calendarId,
         eventId: eventId,

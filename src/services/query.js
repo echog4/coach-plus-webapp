@@ -21,7 +21,7 @@ export const getAthletesByCoachId = async (supabase, coach_id) =>
     )
     .eq("coach_id", coach_id)
     .is("deleted_at", null)
-    .order("date", { ascending: true, referencedTable: "athletes.events" })
+    .order("date", { ascending: false, referencedTable: "athletes.events" })
     .limit(1, { referencedTable: "athletes.events" });
 
 export const getAthleteProfile = async (supabase, athlete_id) =>
@@ -31,7 +31,15 @@ export const getAthleteProfile = async (supabase, athlete_id) =>
       "*, onboarding_form_response(*), check_ins(*), notifications(*), events(*), calendars(*)"
     )
     .eq("id", athlete_id)
-    .limit(10, { referencedTable: "check_ins" });
+    .order(
+      "created_at",
+      { ascending: false, referencedTable: "check_ins" },
+      "date",
+      { ascending: false, referencedTable: "athletes.events" }
+    )
+    .limit(10, { referencedTable: "check_ins" }, 1, {
+      referencedTable: "athletes.events",
+    });
 
 export const insertAthlete = async (supabase, athlete) =>
   await supabase.from("athletes").insert([athlete]).select();
@@ -197,5 +205,7 @@ export const getEventsByCoachIdAthleteId = async (
 export const insertEvent = async (supabase, event) =>
   await supabase.from("events").insert(event).select();
 
-export const deleteSBEvent = async (supabase, id) =>
+export const deleteSBEvent = async (supabase, id) => {
+  await supabase.from("check_ins").delete().eq("event_id", id);
   await supabase.from("events").delete().eq("id", id);
+};

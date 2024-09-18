@@ -9,7 +9,7 @@ import { getTPURLId } from "./bas64";
 // TODO: change base URL
 export const renderGCalDescription = ({ name, overview }, email, id) =>
   `<p><strong>${name}</strong></p><p>${overview}</p>
-<a href="${window.location.href}tp/${getTPURLId(
+<a href="${window.location.origin}/tp/${getTPURLId(
     email,
     id
   )}">View training plan</a>

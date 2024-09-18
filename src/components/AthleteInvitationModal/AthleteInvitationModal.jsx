@@ -15,11 +15,14 @@ import {
   insertCoachAthlete,
   insertOnboardingFormResponse,
 } from "../../services/query";
+import { trimAndValidatePhone } from "../../utils/validations";
 
 export default function AthleteInviteModal({ open, handleClose, onSuccess }) {
   const [loading, setLoading] = useState(false);
   const [forms, setForms] = useState([]);
   const [email, setEmail] = useState("");
+  const [areaCode, setAreaCode] = useState("");
+  const [phone, setPhone] = useState("");
   const [selectedForm, setSelectedForm] = useState(null);
 
   const supabase = useSupabase();
@@ -28,24 +31,49 @@ export default function AthleteInviteModal({ open, handleClose, onSuccess }) {
   const handleInvite = async () => {
     setLoading(true);
     if (!email || !email.match(/^[^@]+@[^@]+\.[^@]+$/)) {
+      setLoading(false);
       return alert("Please enter a valid Gmail address");
     }
     if (!selectedForm) {
+      setLoading(false);
       return alert("Please select an onboarding form");
+    }
+
+    const phone_number = `${areaCode}${phone}`;
+    console.log({ phone_number });
+    if (trimAndValidatePhone(phone_number) === false) {
+      setLoading(false);
+      return alert(
+        "Please enter a valid phone number consisting of digits only"
+      );
     }
 
     let athlete = {
       status: "PENDING",
       email,
+      phone_number,
     };
 
     const { data: existingAthlete, error: _athleteError } =
       await getAthleteByEmail(supabase, email);
 
     if (existingAthlete.length > 0) {
-      athlete = existingAthlete[0];
+      setLoading(false);
+      return alert(
+        "An athlete with this email already exists in the system for you or another coach."
+      );
     } else {
-      const { data: newAthlete } = await insertAthlete(supabase, athlete);
+      const { data: newAthlete, error: nae } = await insertAthlete(
+        supabase,
+        athlete
+      );
+      if (nae) {
+        setLoading(false);
+        return alert(
+          "An athlete with this phone number already exists in the system for you or another coach."
+        );
+      }
+      console.log({ newAthlete });
       if (newAthlete) {
         athlete = newAthlete[0];
       }
@@ -80,6 +108,20 @@ export default function AthleteInviteModal({ open, handleClose, onSuccess }) {
         ]);
       console.log({ newCoachAthlete, newCoachAthleteError });
     }
+
+    // send welcome message
+    console.log({
+      phone: phone_number,
+      onboarding_url: `https://app.coachplus.club/onboarding-form/${newResponse[0].id}`,
+      coach_name: user.full_name,
+    });
+    await supabase.functions.invoke("welcome-wp", {
+      body: {
+        phone: phone_number,
+        onboarding_url: `https://app.coachplus.club/onboarding-form/${newResponse[0].id}`,
+        coach_name: user.full_name,
+      },
+    });
 
     setLoading(false);
     onSuccess();
@@ -121,6 +163,26 @@ export default function AthleteInviteModal({ open, handleClose, onSuccess }) {
             onChange={(e) => setEmail(e.target.value)}
             label="Gmail address"
             type="email"
+            fullWidth
+          />
+        </Box>
+        <Box sx={{ mb: 3 }} display="flex" alignItems="center">
+          <Typography sx={{ mr: 1 }}>+</Typography>
+          <TextField
+            value={areaCode}
+            onChange={(e) => setAreaCode(e.target.value)}
+            label="Country Code"
+            name="country_code"
+            type="number"
+            fullWidth
+            sx={{ mr: 1, width: 120 }}
+          />
+          <TextField
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            label="Phone Number"
+            name="phone"
+            type="number"
             fullWidth
           />
         </Box>

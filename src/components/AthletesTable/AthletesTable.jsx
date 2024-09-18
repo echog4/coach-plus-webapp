@@ -26,6 +26,7 @@ import { useAuth, useSupabase } from "../../providers/AuthContextProvider";
 import { useNavigate } from "react-router-dom";
 import { getAthletesByCoachId } from "../../services/query";
 import { getDistanceText } from "../../utils/calendar";
+import { format } from "date-fns";
 
 export const searchInObjects = (searchTerm, objectsArray) => {
   // Convert the search term to lowercase for case-insensitive search
@@ -91,7 +92,8 @@ export const GetAthleteStatus = ({ athlete }) =>
       icon={<WarningRounded />}
       sx={{ pl: 0.3, fontWeight: 600 }}
     />
-  ) : athlete.events.length === 0 ? (
+  ) : athlete.events.filter((e) => e.date >= format(new Date(), "yyyy-MM-dd"))
+      .length === 0 ? (
     <Chip
       size="small"
       color="warning"
@@ -103,7 +105,9 @@ export const GetAthleteStatus = ({ athlete }) =>
     <Chip
       size="small"
       color="success"
-      label={`${getDistanceText(athlete.events[0].date)}`}
+      label={`${getDistanceText(
+        athlete.events[athlete.events.length - 1].date
+      )}`}
       icon={<CalendarMonth />}
       sx={{ pl: 0.3, fontWeight: 600 }}
     />

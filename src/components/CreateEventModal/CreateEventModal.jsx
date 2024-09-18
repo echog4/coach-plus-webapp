@@ -182,7 +182,7 @@ export const CreateEventModal = ({
             - Once the athlete completes their onboarding, go to their profile
             and create their calendar.
             <br />
-            - Once the calendar is created, youo should be able to create events
+            - Once the calendar is created, you should be able to create events
             for them.
             <br />
           </DialogContentText>
