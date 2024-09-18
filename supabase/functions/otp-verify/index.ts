@@ -25,11 +25,11 @@ Deno.serve(async (req) => {
     );
   }
 
-  await getServiceClient().from("otp").delete().eq("id", token![0].id);
   await getServiceClient().from("users").update({ status: "VERIFIED" }).eq(
     "id",
     user!.id,
   );
+  await getServiceClient().from("otp").delete().eq("user_id", user!.id);
 
   return new Response(
     JSON.stringify({ success: true }),
