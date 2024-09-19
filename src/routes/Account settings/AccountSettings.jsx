@@ -1,17 +1,10 @@
-import {
-  Box,
-  Button,
-  CircularProgress,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Box, Button, TextField, Typography } from "@mui/material";
 import { PageContainer } from "../../components/PageContainer/PageContainer";
 import { Controller, useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { useAuth, useSupabase } from "../../providers/AuthContextProvider";
 import { getCoachById, updateCoach } from "../../services/query";
 import { MobileDatePicker } from "@mui/x-date-pickers";
-import { ca } from "date-fns/locale";
 
 export const AccountSettings = () => {
   const { register, handleSubmit, reset, control } = useForm({
@@ -95,7 +88,7 @@ export const AccountSettings = () => {
                 onClick={async () => {
                   setLoading(true);
                   try {
-                    const { data, error } = await supabase.functions.invoke(
+                    const { data } = await supabase.functions.invoke(
                       "st-checkout",
                       {
                         body: {
