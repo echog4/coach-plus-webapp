@@ -48,6 +48,13 @@ Deno.serve(async (req) => {
     return new Response("ok", { headers: corsHeaders });
   }
 
+  if (req.headers.get("Authorization") !== Deno.env.get("SB_EDGE_AUTH_CODE")) {
+    return new Response(
+      JSON.stringify({ error: "Invalid request" }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
+  }
+
   try {
     // Find events of yesterday
     const yesterday = format(addDays(new Date(), -1), "yyyy-MM-dd");
