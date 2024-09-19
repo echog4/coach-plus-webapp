@@ -29,14 +29,8 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         "messaging_product": "whatsapp",
         "to": json.phone,
-        "type": "template",
-        "template": {
-          "name": "otp_custom",
-          "language": { "code": "en" },
-          "components": [{
-            "type": "body",
-            "parameters": [{ "type": "text", "text": code }],
-          }],
+        "text": {
+          "body": `${code} is your code for Coach+`,
         },
       }),
     },
