@@ -7,6 +7,12 @@ export const getCoachById = async (supabase, id) =>
 export const updateCoach = async (supabase, user, user_id) =>
   await supabase.from("users").update(user).eq("id", user_id);
 
+export const resetCoach = async (supabase, user_id) =>
+  await supabase
+    .from("users")
+    .update({ onboarded_at: null, status: "PENDING" })
+    .eq("id", user_id);
+
 // ATHLETE
 // ATHLETE
 // ATHLETE

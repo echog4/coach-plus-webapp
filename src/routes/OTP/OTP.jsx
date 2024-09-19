@@ -2,6 +2,7 @@ import { PageContainer } from "../../components/PageContainer/PageContainer";
 import { useState } from "react";
 import { useAuth, useSupabase } from "../../providers/AuthContextProvider";
 import { Navigate } from "react-router-dom";
+import { resetCoach } from "../../services/query";
 
 export const OTP = () => {
   const [otpSent, setOtpSent] = useState("");
@@ -68,6 +69,15 @@ export const OTP = () => {
           <button onClick={onSubmit}>Verify OTP</button>
         </>
       )}
+      <br /> <br />
+      <button
+        onClick={async () => {
+          await resetCoach(supabase, user.id);
+          window.location.reload();
+        }}
+      >
+        Change Phone Number
+      </button>
     </PageContainer>
   );
 };

@@ -139,15 +139,12 @@ export const PaymentDialog = ({ open, handleClose, onSuccess }) => {
           onClick={async () => {
             setLoading(true);
             try {
-              const { data, error } = await supabase.functions.invoke(
-                "st-checkout",
-                {
-                  body: {
-                    priceId: process.env.REACT_APP_STRIPE_PRICE,
-                    baseUrl: window.location.origin,
-                  },
-                }
-              );
+              const { data } = await supabase.functions.invoke("st-checkout", {
+                body: {
+                  priceId: process.env.REACT_APP_STRIPE_PRICE,
+                  baseUrl: window.location.origin,
+                },
+              });
               window.location = data.url;
             } catch (error) {
               alert(error.message);
