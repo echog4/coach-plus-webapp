@@ -3,6 +3,8 @@ import {
   Box,
   Button,
   Chip,
+  CircularProgress,
+  Dialog,
   Paper,
   Table,
   TableBody,
@@ -113,13 +115,62 @@ export const GetAthleteStatus = ({ athlete }) =>
     />
   );
 
+export const PaymentDialog = ({ open, handleClose, onSuccess }) => {
+  const [loading, setLoading] = useState(false);
+  const supabase = useSupabase();
+  return (
+    <Dialog open={open} onClose={handleClose}>
+      <Box p={2}>
+        <Typography variant="h6">Subscription</Typography>
+        <Typography variant="subtitle">
+          You need to subscribe to add more athletes
+        </Typography>
+        <br />
+        <br />
+        <input
+          type="hidden"
+          name="priceId"
+          value={process.env.REACT_APP_STRIPE_PRICE}
+        />
+        <br />
+        <button
+          type="submit"
+          disabled={loading}
+          onClick={async () => {
+            setLoading(true);
+            try {
+              const { data, error } = await supabase.functions.invoke(
+                "st-checkout",
+                {
+                  body: {
+                    priceId: process.env.REACT_APP_STRIPE_PRICE,
+                    baseUrl: window.location.origin,
+                  },
+                }
+              );
+              window.location = data.url;
+            } catch (error) {
+              alert(error.message);
+            }
+            setLoading(false);
+          }}
+        >
+          Subscribe
+        </button>
+      </Box>
+    </Dialog>
+  );
+};
+
 export const AthletesTable = ({ pic, name, info, onAthletesLoad }) => {
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
+  const [paymentOpen, setPaymentOpen] = useState(false);
   const [athletes, setAthletes] = useState([]);
   const supabase = useSupabase();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   const getAthletes = () => {
     getAthletesByCoachId(supabase, user.id).then(({ data }) => {
@@ -143,16 +194,37 @@ export const AthletesTable = ({ pic, name, info, onAthletesLoad }) => {
         open={open}
         handleClose={() => setOpen(false)}
       />
+      <PaymentDialog
+        open={paymentOpen}
+        handleClose={() => {
+          setPaymentOpen(false);
+        }}
+      />
       <Box p={2} pb={1} display="flex" alignItems="center">
         <Pool style={{ marginRight: 12 }} />
         <Typography variant="subtitle" fontWeight="900">
           Your Athletes
         </Typography>
+        {loading && <CircularProgress size={20} sx={{ marginLeft: "auto" }} />}
         <Button
           startIcon={<PersonAdd />}
           size="small"
           sx={{ marginLeft: "auto" }}
-          onClick={() => setOpen(true)}
+          disabled={loading}
+          onClick={async () => {
+            setLoading(true);
+            try {
+              const { data } = await supabase.functions.invoke("st-sub-status");
+              if (athletes.length >= 3 && !data.isSubscribed) {
+                setPaymentOpen(true);
+              } else {
+                setOpen(true);
+              }
+            } catch (error) {
+              alert(error.message);
+            }
+            setLoading(false);
+          }}
         >
           Invite
         </Button>

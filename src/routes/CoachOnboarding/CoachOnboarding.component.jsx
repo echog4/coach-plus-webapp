@@ -37,6 +37,23 @@ export const CoachOnboardingComponent = () => {
         "Please enter a valid phone number consisting of digits only"
       );
     }
+    const st_payload = {
+      email: sessionUser.email,
+      name: `${data.first_name} ${data.last_name}`,
+      metadata: {
+        cp_id: sessionUser.id,
+      },
+    };
+
+    const { data: st_user } = await supabase.functions.invoke(
+      "st-create-user",
+      {
+        body: st_payload,
+      }
+    );
+
+    const st_customer_id = st_user?.customer.id;
+
     const payload = {
       ...data,
       phone_number: trimedPhoneNumber,
@@ -44,6 +61,7 @@ export const CoachOnboardingComponent = () => {
       status: "ACTIVE",
       onboarded_at: new Date().toISOString(),
       full_name: `${data.first_name} ${data.last_name}`,
+      st_customer_id,
     };
 
     delete payload.area_code;

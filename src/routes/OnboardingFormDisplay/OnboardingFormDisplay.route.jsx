@@ -51,6 +51,7 @@ export const OnboardingFormDisplayRoute = () => {
         dob,
         status: "VERIFIED",
       };
+      console.log({ athleteData });
 
       const formResponseData = {
         id: obf.id,
@@ -201,7 +202,12 @@ export const OnboardingFormDisplayRoute = () => {
             ))}
           </CardContent>
           <CardActions>
-            <Button sx={{ ml: "auto" }} size="small" type="submit">
+            <Button
+              sx={{ ml: "auto" }}
+              size="small"
+              type="submit"
+              onClick={() => onSubmit()}
+            >
               Submit
             </Button>
           </CardActions>

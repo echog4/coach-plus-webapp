@@ -1,10 +1,17 @@
-import { Box, Button, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { PageContainer } from "../../components/PageContainer/PageContainer";
 import { Controller, useForm } from "react-hook-form";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAuth, useSupabase } from "../../providers/AuthContextProvider";
 import { getCoachById, updateCoach } from "../../services/query";
 import { MobileDatePicker } from "@mui/x-date-pickers";
+import { ca } from "date-fns/locale";
 
 export const AccountSettings = () => {
   const { register, handleSubmit, reset, control } = useForm({
@@ -15,12 +22,28 @@ export const AccountSettings = () => {
   const { user } = useAuth();
   const supabase = useSupabase();
 
+  const [loading, setLoading] = useState(false);
+  const [sub, setSub] = useState(false);
+
   const getCoach = async () => {
     const { data } = await getCoachById(supabase, user.id);
     if (data) {
       reset(data[0]);
       console.log(data);
     }
+  };
+
+  const getSubStatus = async () => {
+    setLoading(true);
+    setTimeout(async () => {
+      try {
+        const { data } = await supabase.functions.invoke("st-sub-status");
+        setSub(data);
+      } catch (error) {
+        alert(error.message);
+      }
+      setLoading(false);
+    }, 1000);
   };
 
   const onSubmit = handleSubmit((data) => {
@@ -35,6 +58,7 @@ export const AccountSettings = () => {
   useEffect(() => {
     if (user) {
       getCoach();
+      getSubStatus();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
@@ -42,6 +66,58 @@ export const AccountSettings = () => {
     <>
       <PageContainer>
         <Typography variant="h5">Account Settings</Typography>
+        {sub && (
+          <Box mt={3}>
+            <Typography variant="h6">
+              Subscription Status:{" "}
+              {sub && sub.isSubscribed ? "Active" : "No subscription"}
+            </Typography>
+            {sub && sub.isSubscribed && (
+              <button
+                onClick={async () => {
+                  setLoading(true);
+                  try {
+                    await supabase.functions.invoke("st-cancel-sub");
+                    getSubStatus();
+                  } catch (error) {
+                    alert(error.message);
+                  }
+                  setLoading(false);
+                }}
+                disabled={loading}
+              >
+                Cancel Subscription
+              </button>
+            )}
+            {!sub.isSubscribed && (
+              <button
+                disabled={loading}
+                onClick={async () => {
+                  setLoading(true);
+                  try {
+                    const { data, error } = await supabase.functions.invoke(
+                      "st-checkout",
+                      {
+                        body: {
+                          priceId: process.env.REACT_APP_STRIPE_PRICE,
+                          baseUrl: window.location.origin,
+                        },
+                      }
+                    );
+                    window.location = data.url;
+                  } catch (error) {
+                    alert(error.message);
+                  }
+                  setLoading(false);
+                }}
+              >
+                Subscribe
+              </button>
+            )}
+          </Box>
+        )}
+        <br />
+        <br />
         <form action="">
           <Box sx={{ mt: 3 }}>
             <TextField
