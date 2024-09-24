@@ -89,6 +89,7 @@ export const insertCoachAthlete = async (supabase, coach_athlete) =>
 // CALENDAR
 // CALENDAR
 // coach_id from session
+// q-cal-insert
 export const insertCalendar = async (supabase, calendar) =>
   await supabase.from("calendars").insert(calendar).select();
 
@@ -96,6 +97,7 @@ export const insertCalendar = async (supabase, calendar) =>
 // OBFORM
 // OBFORM
 //  filter coach_id (user_id) from session
+// q-obf-get
 export const getOnboardingFormsByUserId = async (supabase, user_id) =>
   await supabase
     .from("onboarding_forms")
