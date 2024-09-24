@@ -106,10 +106,12 @@ export const getOnboardingFormsByUserId = async (supabase, user_id) =>
     .is("deleted_at", null);
 
 // filter coach_id from session
+// q-obf-upsert
 export const upsertOnboardingForm = async (supabase, onboarding_form) =>
   await supabase.from("onboarding_forms").upsert(onboarding_form).select();
 
 // filter coach_id from session
+// q-obf-delete
 export const deleteOnboardingForm = async (supabase, id) =>
   await supabase
     .from("onboarding_forms")
@@ -119,6 +121,7 @@ export const deleteOnboardingForm = async (supabase, id) =>
 //  OBFORM RESPONSE
 //  OBFORM RESPONSE
 //  OBFORM RESPONSE
+// q-obfres-get
 export const getOnboardingFormResponseById = async (supabase, id) =>
   await supabase
     .from("onboarding_form_response")
@@ -126,6 +129,7 @@ export const getOnboardingFormResponseById = async (supabase, id) =>
     .eq("id", id);
 
 // filter coach_id from session
+// q-obfres-insert
 export const insertOnboardingFormResponse = async (
   supabase,
   onboarding_form_response
@@ -136,6 +140,7 @@ export const insertOnboardingFormResponse = async (
     .select();
 
 // public method no session
+// q-obfres-p-upsert
 export const upsertOnboardingFormResponse = async (
   supabase,
   onboarding_form_response
