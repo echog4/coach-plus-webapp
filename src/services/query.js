@@ -61,9 +61,12 @@ export const getAthleteProfile = async (supabase, athlete_id) =>
     });
 
 // with coach_id from session
+// q-athlete-insert
 export const insertAthlete = async (supabase, athlete) =>
   await supabase.from("athletes").insert([athlete]).select();
+
 // with coach_id from session
+// q-athlete-upsert
 export const upsertAthlete = async (supabase, athlete) =>
   supabase.from("athletes").upsert(athlete);
 
@@ -77,6 +80,7 @@ export const getCoachAthlete = async (supabase, coach_id, athlete_id) =>
     .select()
     .eq("coach_id", coach_id)
     .eq("athlete_id", athlete_id);
+
 //  coach_id from session
 export const insertCoachAthlete = async (supabase, coach_athlete) =>
   await supabase.from("coach_athletes").insert(coach_athlete).select();
