@@ -1,6 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { corsHeaders } from "../_shared/cors.ts";
-import { getServiceClient, getTokenUser } from "../_shared/auth.ts";
+import { getServiceClient } from "../_shared/auth.ts";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -9,11 +9,12 @@ Deno.serve(async (req) => {
 
   try {
     const body = await req.json();
-    const user = await getTokenUser(req.headers.get("Authorization")!);
-    const supabase = getServiceClient();
+
+    const res = await getServiceClient().from("athletes").select()
+      .eq("email", body.email);
 
     return new Response(
-      JSON.stringify({ success: true }),
+      JSON.stringify(res),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (e) {

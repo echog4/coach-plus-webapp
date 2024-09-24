@@ -8,9 +8,11 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const body = await req.json();
     const user = await getTokenUser(req.headers.get("Authorization")!);
-    const supabase = getServiceClient();
+
+    await getServiceClient().from("users")
+      .update({ onboarded_at: null, status: "PENDING" })
+      .eq("id", user!.id);
 
     return new Response(
       JSON.stringify({ success: true }),

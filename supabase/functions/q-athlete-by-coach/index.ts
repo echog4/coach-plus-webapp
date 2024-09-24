@@ -8,12 +8,21 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const body = await req.json();
     const user = await getTokenUser(req.headers.get("Authorization")!);
     const supabase = getServiceClient();
 
+    const res = supabase
+      .from("coach_athletes")
+      .select(
+        "*, athletes(*, onboarding_form_response(*), calendars(*), events(*))",
+      )
+      .eq("coach_id", user!.id)
+      .is("deleted_at", null)
+      .order("date", { ascending: false, referencedTable: "athletes.events" })
+      .limit(1, { referencedTable: "athletes.events" });
+
     return new Response(
-      JSON.stringify({ success: true }),
+      JSON.stringify(res),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (e) {

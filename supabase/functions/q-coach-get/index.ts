@@ -8,18 +8,20 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const body = await req.json();
     const user = await getTokenUser(req.headers.get("Authorization")!);
-    const supabase = getServiceClient();
+    const res = await getServiceClient().from("users").select().eq(
+      "id",
+      user!.id,
+    );
 
     return new Response(
-      JSON.stringify({ success: true }),
+      JSON.stringify(res),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (e) {
     console.log(e);
     return new Response(
-      JSON.stringify({ error: "Error occured." }),
+      JSON.stringify({ error: "Coach not found." }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   }
