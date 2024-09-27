@@ -187,6 +187,7 @@ export const deleteExercise = async (supabase, id) =>
 // filter coach_id from session
 export const upsertPlan = async (supabase, plan) =>
   await supabase.from("plans").upsert(plan).select();
+
 // filter coach_id from session
 export const deletePlan = async (supabase, id) =>
   await supabase.from("plans").update({ deleted_at: new Date() }).eq("id", id);
