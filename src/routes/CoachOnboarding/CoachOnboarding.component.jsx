@@ -63,7 +63,6 @@ export const CoachOnboardingComponent = () => {
       full_name: `${data.first_name} ${data.last_name}`,
       st_customer_id,
     };
-
     delete payload.area_code;
 
     await updateCoach(supabase, payload, sessionUser.id);
