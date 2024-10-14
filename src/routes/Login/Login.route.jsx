@@ -34,7 +34,7 @@ export const LoginRoute = () => {
               Coach+
             </Typography>
             <Typography variant="body1" sx={{ mb: 4, textAlign: "center" }}>
-              Sign in with Google and continue to your dashboard
+              Sign in with Google and continue to your dashboard.
             </Typography>
             <Button onClick={signIn}>
               <GoogleButtonIcon />
