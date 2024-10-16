@@ -262,3 +262,11 @@ export const deleteSBEvent = async (supabase, id) => {
   await supabase.from("check_ins").delete().eq("event_id", id);
   await supabase.from("events").delete().eq("id", id);
 };
+
+// Delete athlete
+export const deleteAthlete = async (supabase, athlete_id) =>
+  await supabase.functions.invoke("q-delete-athlete", {
+    body: {
+      athlete_id,
+    },
+  });

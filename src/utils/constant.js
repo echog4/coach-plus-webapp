@@ -1,4 +1,5 @@
-export const G_SCOPE = "email profile https://www.googleapis.com/auth/calendar";
+export const G_SCOPE =
+  "email profile https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/calendar.calendars https://www.googleapis.com/auth/calendar.calendarlist https://www.googleapis.com/auth/calendar.acls";
 
 export const LSN_SESSION_KEY = "sb_session";
 export const LSN_SELECTED_CALENDARS = "cp_selected_calendars";
