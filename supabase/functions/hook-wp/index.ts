@@ -28,9 +28,11 @@ Deno.serve(async (req) => {
 
     const ci_id = athlete[0]!.check_ins[0].id;
 
+    const { data: check_in } = await getServiceClient().from("check_ins").select("*").eq("id", ci_id);
+
     await getServiceClient().from("check_ins").update({
       body,
-      feedback: message,
+      feedback: check_in[0]!.feedback ? `${check_in[0]!.feedback}\n${message}` : message,
       status: "completed",
     }).eq("id", ci_id);
 

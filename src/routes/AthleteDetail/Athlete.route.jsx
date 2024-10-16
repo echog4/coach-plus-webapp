@@ -17,16 +17,24 @@ import {
 } from "@mui/material";
 import { PageContainer } from "../../components/PageContainer/PageContainer";
 import Grid2 from "@mui/material/Unstable_Grid2/Grid2";
-import { Close, Edit, Mail, Phone, WarningRounded } from "@mui/icons-material";
+import {
+  Close,
+  Delete,
+  Edit,
+  Mail,
+  Phone,
+  WarningRounded,
+} from "@mui/icons-material";
 import { LineChart } from "@mui/x-charts";
 import React, { useEffect, useState } from "react";
 import { useAuth, useSupabase } from "../../providers/AuthContextProvider";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useCalendar } from "../../providers/CalendarProvider";
 import { getAthleteName } from "../../utils/selectors";
 import { CalendarComponent } from "../../components/Calendar/Calendar";
 
 import {
+  deleteAthlete,
   getAthleteProfile,
   getCalendarsByCoachIdAthleteId,
   insertCalendar,
@@ -189,6 +197,8 @@ export const AthleteRoute = () => {
 
   const [editModal, setEditModal] = useState(false);
 
+  const navigate = useNavigate();
+
   const reloadCalendars = () =>
     getCalendarsByCoachIdAthleteId(supabase, user.id, params.id).then(
       (calendars) => {
@@ -306,7 +316,7 @@ export const AthleteRoute = () => {
       <PageContainer>
         <Paper sx={{ mb: 4 }} variant="outlined">
           <Box sx={{ padding: 3 }}>
-            <Box display="flex" alignItems="center" mb={3}>
+            <Box display="flex" alignItems="center" mb={1}>
               <Box>
                 <Typography variant="h6" fontWeight="900" sx={{ mr: 2, mb: 1 }}>
                   {getAthleteName(athlete)}
@@ -333,6 +343,22 @@ export const AthleteRoute = () => {
               </IconButton>
               <IconButton size="small" onClick={() => setEditModal(true)}>
                 <Edit />
+              </IconButton>
+              <IconButton
+                size="small"
+                onClick={() => {
+                  if (
+                    window.confirm(
+                      "Are you sure you want to delete this athlete?"
+                    )
+                  ) {
+                    deleteAthlete(supabase, athlete.id).then(() =>
+                      navigate("/")
+                    );
+                  }
+                }}
+              >
+                <Delete />
               </IconButton>
             </Box>
 
@@ -380,7 +406,7 @@ export const AthleteRoute = () => {
                     </Box>
                   </Typography>
                 )}
-                <Box display="flex" flexWrap="wrap">
+                <Box display="flex" flexWrap="wrap" mb={2}>
                   <Box mr={4}>
                     <Typography variant="subtitle2" mb={2}>
                       Height
@@ -433,6 +459,26 @@ export const AthleteRoute = () => {
                     </Box>
                   )}
                 </Box>
+                {athlete.onboarding_form_response[0] &&
+                  athlete.onboarding_form_response[0].custom_responses && (
+                    <Box>
+                      {Object.keys(
+                        athlete.onboarding_form_response[0].custom_responses
+                      ).map((key) => (
+                        <Box key={key} mb={1}>
+                          <Typography variant="subtitle2" mb={0.5}>
+                            {key}
+                          </Typography>
+                          <Typography>
+                            {
+                              athlete.onboarding_form_response[0]
+                                .custom_responses[key]
+                            }
+                          </Typography>
+                        </Box>
+                      ))}
+                    </Box>
+                  )}
               </Box>
             )}
           </Box>
@@ -447,7 +493,7 @@ export const AthleteRoute = () => {
                       width: "100%",
                       bgcolor: "background.paper",
                     }}
-                    subheader={<ListSubheader>Last 10 Check-ins</ListSubheader>}
+                    subheader={<ListSubheader>Check-ins</ListSubheader>}
                   >
                     {/* TODO Implement check-ins */}
                     {athlete.check_ins.map((c, i) => (
@@ -457,7 +503,7 @@ export const AthleteRoute = () => {
                             primary={`New feedback on ${new Date(
                               c.created_at
                             ).toLocaleDateString()}`}
-                            secondary={c.feedback}
+                            secondary={<pre>{c.feedback}</pre>}
                           />
                         </ListItemButton>
                         <Divider />

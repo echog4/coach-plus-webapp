@@ -9,7 +9,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { Add, Delete, Edit, List } from "@mui/icons-material";
+import { Add, Delete, Edit } from "@mui/icons-material";
 import ResponsesModal from "../../components/ResponsesModal/ResponsesModal";
 import { useEffect, useState } from "react";
 import OnboardingFormModal from "../../components/OnboardingFormModal/OnboardingFormModal";
@@ -118,14 +118,6 @@ export const OnboardingFormsRoute = () => {
                         onClick={() => setFormOpen(form)}
                       >
                         Edit
-                      </Button>
-                      <Button
-                        color="primary"
-                        size="small"
-                        startIcon={<List />}
-                        onClick={() => setResponseOpen(form)}
-                      >
-                        Responses
                       </Button>
                       <IconButton
                         sx={{ ml: "auto" }}
