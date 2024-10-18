@@ -22,6 +22,7 @@ import { PATH_COACH_ONBOARDING } from "./utils/constant";
 import { AccountSettings } from "./routes/Account settings/AccountSettings";
 import { TPDisplay } from "./components/TPDisplay/TPDisplay";
 import { OTP } from "./routes/OTP/OTP";
+import { ImportExercisesRoute } from "./routes/ImportExercises/ImportExercises.route";
 
 function App() {
   const [drawerOpen, setDrawerOpen] = React.useState(false);
@@ -103,6 +104,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <TrainingPlanRoute />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/import-exercises"
+              element={
+                <ProtectedRoute>
+                  <ImportExercisesRoute />
                 </ProtectedRoute>
               }
             />

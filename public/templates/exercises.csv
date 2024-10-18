@@ -1,0 +1,4 @@
+Title,Description,Sport Types,Sets,Reps,Rest in seconds,Distance in meters,Time in minutes,Videos,Images
+Barbell Back Squat,Perform a squat with a barbell resting on your upper back,"tennis/padel, golf, basketball",3,8,90,,,"https://www.youtube.com/watch?v=SW_C1A-rejs,https://www.youtube.com/watch?v=SW_C1A-rejs","https://example.com/back_squat.jpg,https://example.com/push_ups.jpg"
+Push-Ups,Standard push-ups from a plank position,"golf, basketball",3,15,60,,,https://www.youtube.com/watch?v=IODxDxX7oi4,"https://example.com/push_ups.jpg,https://example.com/push_ups.jpg"
+400m Sprint,Run 400 meters at maximum speed,basketball,4,,120,400,,,"https://example.com/400m_sprint.jpg,https://example.com/400m_sprint.jpg"

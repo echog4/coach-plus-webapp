@@ -170,12 +170,23 @@ export const TrainingPlanRoute = () => {
         {/* EXCERSISE */}
         {/* EXCERSISE */}
         <Box sx={{ display: "flex", alignItems: "center", pt: 2 }}>
-          <Typography variant="h5">Exercises</Typography>
+          <Typography variant="h5" style={{ marginRight: 5 }}>
+            Exercises
+          </Typography>
           <Button
             variant="contained"
             startIcon={<Add />}
             size="small"
             sx={{ marginLeft: "auto" }}
+            href="/import-exercises"
+          >
+            Import
+          </Button>
+          <Button
+            variant="contained"
+            startIcon={<Add />}
+            size="small"
+            sx={{ marginLeft: 1 }}
             onClick={() => setExerciseModalOpen(true)}
           >
             Add New Exercise
