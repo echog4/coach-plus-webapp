@@ -191,7 +191,7 @@ export const AthleteRoute = () => {
   const supabase = useSupabase();
   const { user } = useAuth();
   const [calendars, setCalendars] = useState([]);
-  const { createCalendar, getCalendar, gapiInited } = useCalendar();
+  const { createCalendar, getCalendar, gapiInited, createAcl } = useCalendar();
   const [createCalendarLoading, setCreateCalendarLoading] = useState(false);
   const [eventModalOpen, setEventModalOpen] = useState(false);
 
@@ -225,6 +225,7 @@ export const AthleteRoute = () => {
 
       const calendar = await createCalendar(calendarData);
       const the_calendar = await getCalendar(calendar.id);
+      await createAcl(calendar.id, athlete.email);
 
       const sbCalendar = {
         gcal_id: calendar.id,

@@ -194,6 +194,21 @@ export const CalendarProvider = ({ children }) => {
       };
       return (await gapi.client.calendar.events.insert(request)).result;
     },
+    createAcl: async (calendarId, athleteEmail) => {
+      console.log("createAcl", calendarId, athleteEmail);
+      await window.calendarContextValue.refreshGoogleToken(true);
+      const request = {
+        calendarId: calendarId,
+        resource: {
+          role: "reader",
+          scope: {
+            type: "user",
+            value: athleteEmail,
+          },
+        },
+      };
+      return (await gapi.client.calendar.acl.insert(request)).result;
+    },
     deleteEvent: async (calendarId, eventId) => {
       await window.calendarContextValue.refreshGoogleToken(true);
       const request = {
