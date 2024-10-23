@@ -58,7 +58,7 @@ export const CoachOnboardingComponent = () => {
       ...data,
       phone_number: trimedPhoneNumber,
       email: sessionUser.email,
-      status: "VERIFIED",
+      status: "ACTIVE",
       onboarded_at: new Date().toISOString(),
       full_name: `${data.first_name} ${data.last_name}`,
       st_customer_id,

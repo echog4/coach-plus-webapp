@@ -13,12 +13,12 @@ export const sideBarConfig = [
     icon: <Dashboard />,
   },
   {
-    name: "Training Plans",
+    name: "Plans",
     path: "/training-plan",
     icon: <Checklist />,
   },
   {
-    name: "Onboarding Forms",
+    name: "Forms",
     path: "/onboarding-forms",
     icon: <Article />,
   },
