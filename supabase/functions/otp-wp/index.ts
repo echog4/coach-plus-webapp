@@ -19,7 +19,7 @@ Deno.serve(async (req) => {
   });
 
   const message_response = await fetch(
-    "https://graph.facebook.com/v20.0/422106364317179/messages",
+    "https://graph.facebook.com/v20.0/444884515375910/messages",
     {
       method: "POST",
       headers: {
