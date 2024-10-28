@@ -17,7 +17,7 @@ const sendMessage = async (phone) => {
         to: phone,
         type: "template",
         template: {
-          name: "checkin",
+          name: "checkin_prod",
           language: {
             code: "en_US",
           },

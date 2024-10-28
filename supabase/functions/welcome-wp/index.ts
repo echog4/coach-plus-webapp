@@ -22,7 +22,7 @@ Deno.serve(async (req) => {
           "to": json.phone,
           "type": "template",
           "template": {
-            "name": "welcome_athlete",
+            "name": "welcome_athlete_prod",
             "language": { "code": "en" },
             "components": [{
               "type": "body",

@@ -31,7 +31,7 @@ Deno.serve(async (req) => {
         "to": json.phone,
         "type": "template",
         "template": {
-          "name": "otp_custom",
+          "name": "otp_custom_prod",
           "language": { "code": "en" },
           "components": [{
             "type": "body",
