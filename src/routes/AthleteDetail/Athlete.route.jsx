@@ -199,6 +199,14 @@ export const AthleteRoute = () => {
 
   const navigate = useNavigate();
 
+  const getEventDate = (event_id) => {
+    if (!athlete) {
+      return;
+    }
+    const event = athlete.events.find((e) => e.id === event_id);
+    return event.date;
+  };
+
   const reloadCalendars = () =>
     getCalendarsByCoachIdAthleteId(supabase, user.id, params.id).then(
       (calendars) => {
@@ -501,9 +509,9 @@ export const AthleteRoute = () => {
                       <React.Fragment key={i}>
                         <ListItemButton>
                           <ListItemText
-                            primary={`New feedback on ${new Date(
-                              c.created_at
-                            ).toLocaleDateString()}`}
+                            primary={`New feedback for training on ${getEventDate(
+                              c.event_id
+                            )}`}
                             secondary={<pre>{c.feedback}</pre>}
                           />
                         </ListItemButton>
