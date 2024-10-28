@@ -6,7 +6,6 @@
 import { format, formatDistanceToNow, parse } from "date-fns";
 import { getTPURLId } from "./bas64";
 
-// TODO: change base URL
 export const renderGCalDescription = ({ name, overview }, email, id) =>
   `<p><strong>${name}</strong></p><p>${overview}</p>
 <a href="${window.location.origin}/tp/${getTPURLId(

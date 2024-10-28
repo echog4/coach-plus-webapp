@@ -214,7 +214,6 @@ export const AthleteRoute = () => {
       }
     );
   useEffect(() => {
-    // TODO: handle calendar data
     if (!user) {
       return;
     }
@@ -504,7 +503,6 @@ export const AthleteRoute = () => {
                     }}
                     subheader={<ListSubheader>Check-ins</ListSubheader>}
                   >
-                    {/* TODO Implement check-ins */}
                     {athlete.check_ins.map((c, i) => (
                       <React.Fragment key={i}>
                         <ListItemButton>
