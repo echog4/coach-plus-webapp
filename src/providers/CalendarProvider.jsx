@@ -26,7 +26,7 @@ export const CalendarProvider = ({ children }) => {
           "https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest",
         ],
       });
-      // TODO: disable this line. should be handled by gis
+
       await window.gapi.client.setToken({
         access_token: localSession.provider_token,
         refresh_token: localSession.provider_refresh_token,
