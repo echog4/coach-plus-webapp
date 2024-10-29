@@ -2,7 +2,6 @@ import { Box, Button, Paper, Typography } from "@mui/material";
 import { GoogleButtonIcon } from "../../components/icons/GoogleButton";
 import { PageContainer } from "../../components/PageContainer/PageContainer";
 import { useAuth } from "../../providers/AuthContextProvider";
-import { SportsGymnastics } from "@mui/icons-material";
 
 export const LoginRoute = () => {
   const { signIn } = useAuth();
@@ -29,7 +28,7 @@ export const LoginRoute = () => {
               flexDirection: "column",
             }}
           >
-            <SportsGymnastics sx={{ height: 48, width: "auto" }} />
+            <img src="/logo-black.png" alt="Coach+" style={{ width: 64 }} />
             <Typography variant="h4" sx={{ mb: 4 }}>
               Coach+
             </Typography>

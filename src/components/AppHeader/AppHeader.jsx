@@ -2,7 +2,7 @@ import * as React from "react";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import { Menu as MenuIcon, SportsGymnastics } from "@mui/icons-material";
+import { Menu as MenuIcon } from "@mui/icons-material";
 import { Avatar, IconButton, Menu, MenuItem } from "@mui/material";
 import { useAuth } from "../../providers/AuthContextProvider";
 
@@ -78,7 +78,7 @@ export const AppHeader = ({ handleDrawerToggle }) => {
           aria-label="menu"
           sx={{ mr: 2 }}
         >
-          <SportsGymnastics />
+          <img src="/logo-white.png" alt="Coach+" style={{ width: 32 }} />
         </IconButton>
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
           Coach+
