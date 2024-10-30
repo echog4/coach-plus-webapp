@@ -202,12 +202,7 @@ export const OnboardingFormDisplayRoute = () => {
             ))}
           </CardContent>
           <CardActions>
-            <Button
-              sx={{ ml: "auto" }}
-              size="small"
-              type="submit"
-              onClick={() => onSubmit()}
-            >
+            <Button sx={{ ml: "auto" }} size="small" type="submit">
               Submit
             </Button>
           </CardActions>
