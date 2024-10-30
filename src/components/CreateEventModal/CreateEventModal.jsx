@@ -178,7 +178,9 @@ export const CreateEventModal = ({
             {events.map((e, i) => (
               <React.Fragment key={i}>
                 <Box sx={{ mb: 1, display: "flex", alignItems: "center" }}>
-                  <Typography variant="subtitle">Event {i + 1}</Typography>
+                  <Typography variant="subtitle">
+                    Training Day {i + 1}
+                  </Typography>
                   {i > 0 && (
                     <IconButton
                       onClick={() =>
@@ -242,6 +244,13 @@ export const CreateEventModal = ({
                 </Box>
               </React.Fragment>
             ))}
+            <Button
+              onClick={() => setEvents([...events, defaultEvent])}
+              variant="contained"
+              sx={{ width: "100%" }}
+            >
+              Add Training Day
+            </Button>
           </>
         ) : (
           <DialogContentText>
@@ -260,13 +269,6 @@ export const CreateEventModal = ({
         )}
       </DialogContent>
       <DialogActions>
-        <Button
-          onClick={() => setEvents([...events, defaultEvent])}
-          sx={{ mr: "auto" }}
-          color="info"
-        >
-          Add Event
-        </Button>
         <Button onClick={handleClose}>Close</Button>
         <Button onClick={handleSubmit} disabled={loading} color="success">
           Create
