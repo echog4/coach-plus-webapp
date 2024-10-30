@@ -74,6 +74,7 @@ export const upsertAthlete = async (supabase, athlete) =>
 // COACH ATHLETE
 // COACH ATHLETE
 // filter coach_id from session
+// q-ca-get
 export const getCoachAthlete = async (supabase, coach_id, athlete_id) =>
   await supabase
     .from("coach_athletes")
@@ -82,16 +83,9 @@ export const getCoachAthlete = async (supabase, coach_id, athlete_id) =>
     .eq("athlete_id", athlete_id);
 
 //  coach_id from session
+// q-ca-insert
 export const insertCoachAthlete = async (supabase, coach_athlete) =>
   await supabase.from("coach_athletes").insert(coach_athlete).select();
-
-// CALENDAR
-// CALENDAR
-// CALENDAR
-// coach_id from session
-// q-cal-insert
-export const insertCalendar = async (supabase, calendar) =>
-  await supabase.from("calendars").insert(calendar).select();
 
 // OBFORM
 // OBFORM
@@ -121,7 +115,7 @@ export const deleteOnboardingForm = async (supabase, id) =>
 //  OBFORM RESPONSE
 //  OBFORM RESPONSE
 //  OBFORM RESPONSE
-// q-obfres-get
+// q-obfres-p-get
 export const getOnboardingFormResponseById = async (supabase, id) =>
   await supabase
     .from("onboarding_form_response")
@@ -150,6 +144,7 @@ export const upsertOnboardingFormResponse = async (
 // TRAINING PLANS
 // TRAINING PLANS
 // filter coach_id from session
+// q-exercise-by-coach
 export const getExercisesByCoachId = async (supabase, coach_id) =>
   await supabase
     .from("exercises")
@@ -158,6 +153,7 @@ export const getExercisesByCoachId = async (supabase, coach_id) =>
     .is("deleted_at", null);
 
 // public display
+// q-plan-p-get
 export const getPlanByIdPublic = async (supabase, id, email) =>
   await supabase
     .from("plans")
@@ -166,6 +162,7 @@ export const getPlanByIdPublic = async (supabase, id, email) =>
     .is("deleted_at", null);
 
 // filter coach_id from session
+// q-plan-get-by-coach
 export const getPlansByCoachId = async (supabase, coach_id) =>
   await supabase
     .from("plans")
@@ -174,10 +171,12 @@ export const getPlansByCoachId = async (supabase, coach_id) =>
     .is("deleted_at", null);
 
 // filter coach_id from session
+// q-exercise-upsert
 export const upsertExercise = async (supabase, exercise) =>
   await supabase.from("exercises").upsert(exercise).select();
 
 // filter coach_id from session
+// q-exercise-delete
 export const deleteExercise = async (supabase, id) =>
   await supabase
     .from("exercises")
@@ -185,18 +184,22 @@ export const deleteExercise = async (supabase, id) =>
     .eq("id", id);
 
 // filter coach_id from session
+// q-plan-upsert
 export const upsertPlan = async (supabase, plan) =>
   await supabase.from("plans").upsert(plan).select();
 
 // filter coach_id from session
+// q-plan-delete
 export const deletePlan = async (supabase, id) =>
   await supabase.from("plans").update({ deleted_at: new Date() }).eq("id", id);
 
 // public
+// q-ep-insert
 export const insertExercisePlans = async (supabase, exercise_plan) =>
   await supabase.from("exercise_plans").insert(exercise_plan).select();
 
 // public
+// q-ep-delete
 export const deleteExercisePlans = async (supabase, id) =>
   await supabase.from("exercise_plans").delete().eq("plan_id", id);
 
@@ -204,6 +207,7 @@ export const deleteExercisePlans = async (supabase, id) =>
 // CALENDARS
 // CALENDARS
 // filter coach_id from session
+// q-cal-get-by-coach
 export const getCalendarsByCoachId = async (supabase, coach_id) =>
   await supabase
     .from("calendars")
@@ -212,6 +216,7 @@ export const getCalendarsByCoachId = async (supabase, coach_id) =>
     .is("deleted_at", null)
     .order("id", { ascending: true });
 // filter coach_id from session
+// q-cal-get-by-coach-athlete
 export const getCalendarsByCoachIdAthleteId = async (
   supabase,
   coach_id,
@@ -224,13 +229,19 @@ export const getCalendarsByCoachIdAthleteId = async (
     .eq("athlete_id", athlete_id)
     .is("deleted_at", null);
 // filter coach_id from session
+// q-cal-toggle
 export const toggleCalendar = async (supabase, id, enabled) =>
   await supabase.from("calendars").update({ enabled }).eq("id", id);
+
+// q-cal-insert
+export const insertCalendar = async (supabase, calendar) =>
+  await supabase.from("calendars").insert(calendar).select();
 
 // EVENTS
 // EVENTS
 // EVENTS
 // filter coach_id from session
+// q-events-get-by-coach
 export const getEventsByCoachId = async (supabase, coach_id) =>
   await supabase
     .from("events")
@@ -240,6 +251,7 @@ export const getEventsByCoachId = async (supabase, coach_id) =>
     .is("deleted_at", null);
 
 // filter coach_id from session
+// q-events-get-by-coach-athlete
 export const getEventsByCoachIdAthleteId = async (
   supabase,
   coach_id,
@@ -254,16 +266,19 @@ export const getEventsByCoachIdAthleteId = async (
     .is("deleted_at", null);
 
 // filter coach_id from session
+// q-events-insert
 export const insertEvent = async (supabase, event) =>
   await supabase.from("events").insert(event).select();
 
 // filter coach_id from session
+// q-events-delete
 export const deleteSBEvent = async (supabase, id) => {
   await supabase.from("check_ins").delete().eq("event_id", id);
   await supabase.from("events").delete().eq("id", id);
 };
 
 // Delete athlete
+// q-delete-athlete
 export const deleteAthlete = async (supabase, athlete_id) =>
   await supabase.functions.invoke("q-delete-athlete", {
     body: {

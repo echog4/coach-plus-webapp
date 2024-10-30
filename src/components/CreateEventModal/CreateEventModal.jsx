@@ -107,12 +107,13 @@ export const CreateEventModal = ({
           date: end,
           timeZone: getTimeZone(),
         },
-        attendees: [
-          {
-            email: selectedAthlete.email,
-            displayName: getAthleteName(selectedAthlete),
-          },
-        ],
+        // Creates double events :(
+        // attendees: [
+        //   {
+        //     email: selectedAthlete.email,
+        //     displayName: getAthleteName(selectedAthlete),
+        //   },
+        // ],
         reminders: {
           useDefault: true,
         },
