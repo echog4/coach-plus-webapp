@@ -1,10 +1,17 @@
+import React from "react";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import { Autocomplete, Box, TextField, Typography } from "@mui/material";
+import {
+  Autocomplete,
+  Box,
+  IconButton,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { useAuth, useSupabase } from "../../providers/AuthContextProvider";
 import { useEffect, useState } from "react";
 import { getAthleteName } from "../../utils/selectors";
@@ -21,6 +28,12 @@ import {
   getSQLDate,
 } from "../../utils/calendar";
 import { addDays, format } from "date-fns";
+import { Delete } from "@mui/icons-material";
+
+const defaultEvent = {
+  plan: null,
+  date: null,
+};
 
 export const CreateEventModal = ({
   open,
@@ -28,18 +41,19 @@ export const CreateEventModal = ({
   onSuccess,
   athleteId,
 }) => {
-  const [loading, setLoading] = useState(false);
-  const [eventDate, setEventDate] = useState(null);
-
   const [athletes, setAthletes] = useState([]);
+  const [plans, setPlans] = useState([]);
+  const [events, setEvents] = useState([defaultEvent]);
+  const [eventCount, setEventCount] = useState(0);
+
   const [selectedAthlete, setSelectedAthlete] = useState(null);
 
-  const [plans, setPlans] = useState([]);
-  const [selectedPlan, setSelectedPlan] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const supabase = useSupabase();
   const { user } = useAuth();
   const { createEvent } = useCalendar();
+
   useEffect(() => {
     if (!user) {
       return;
@@ -64,56 +78,70 @@ export const CreateEventModal = ({
   const handleSubmit = async () => {
     setLoading(true);
 
-    if (!selectedAthlete || !eventDate || !selectedPlan) {
+    const isInvalid = events.some((e) => !e.date || !e.plan);
+
+    if (isInvalid) {
       setLoading(false);
-      return alert("Please fill all fields");
+      return alert("Please fill all fields for all the events");
     }
 
     const gcal_id = selectedAthlete.calendars[0].gcal_id;
-    const sb_start = getSQLDate(eventDate);
-    const start = format(eventDate, "yyyy-MM-dd");
-    const end = format(addDays(eventDate, 1), "yyyy-MM-dd");
 
-    // Create google calendar event
-    const gcal_payload = {
-      summary: `C+ ${getAthleteName(selectedAthlete)} - ${selectedPlan.name}`,
-      description: renderGCalDescription(
-        selectedPlan,
-        selectedAthlete.email,
-        selectedPlan.id
-      ),
-      start: {
-        date: start,
-        timeZone: getTimeZone(),
-      },
-      end: {
-        date: end,
-        timeZone: getTimeZone(),
-      },
-      attendees: [
-        {
-          email: selectedAthlete.email,
-          displayName: getAthleteName(selectedAthlete),
+    const events_payload = events.map((e) => {
+      const start = format(e.date, "yyyy-MM-dd");
+      const end = format(addDays(e.date, 1), "yyyy-MM-dd");
+      const sb_start = getSQLDate(e.date);
+
+      const gcal_event = {
+        summary: `C+ ${getAthleteName(selectedAthlete)} - ${e.plan.name}`,
+        description: renderGCalDescription(
+          e.plan,
+          selectedAthlete.email,
+          e.plan.id
+        ),
+        start: {
+          date: start,
+          timeZone: getTimeZone(),
         },
-      ],
-      reminders: {
-        useDefault: true,
-      },
-    };
-    const gcal_event = await createEvent(gcal_id, gcal_payload);
+        end: {
+          date: end,
+          timeZone: getTimeZone(),
+        },
+        attendees: [
+          {
+            email: selectedAthlete.email,
+            displayName: getAthleteName(selectedAthlete),
+          },
+        ],
+        reminders: {
+          useDefault: true,
+        },
+      };
 
-    // Create supabase event
-    const sb_event = {
-      date: sb_start,
-      calendar_id: selectedAthlete.calendars[0].id,
-      gcal_id,
-      payload: gcal_event,
-      coach_id: user.id,
-      athlete_id: selectedAthlete.id,
-      plan_id: selectedPlan.id,
-    };
+      const sb_event = {
+        date: sb_start,
+        calendar_id: selectedAthlete.calendars[0].id,
+        gcal_id,
+        payload: gcal_event,
+        coach_id: user.id,
+        athlete_id: selectedAthlete.id,
+        plan_id: e.plan.id,
+      };
 
-    await insertEvent(supabase, sb_event);
+      return { gcal_event, sb_event };
+    });
+
+    // map create events for both google and supabase
+    await Promise.all(
+      events_payload.map(async (e) => {
+        const gcal_event = await createEvent(gcal_id, e.gcal_event);
+        await insertEvent(supabase, { ...e.sb_event, payload: gcal_event });
+        setEventCount(eventCount + 1);
+      })
+    ).catch((err) => {
+      alert("Error creating events");
+      setLoading(false);
+    });
 
     setLoading(false);
     onSuccess && onSuccess();
@@ -146,31 +174,74 @@ export const CreateEventModal = ({
                 value={selectedAthlete}
               />
             </Box>
-            <Box mb={3}>
-              <MobileDatePicker
-                label="Event Date"
-                sx={{
-                  width: "100%",
-                }}
-                value={eventDate}
-                onChange={(date) => setEventDate(date)}
-              />
-            </Box>
+            {/* Single Event */}
+            {events.map((e, i) => (
+              <React.Fragment key={i}>
+                <Box sx={{ mb: 1, display: "flex", alignItems: "center" }}>
+                  <Typography variant="subtitle">Event {i + 1}</Typography>
+                  {i > 0 && (
+                    <IconButton
+                      onClick={() =>
+                        setEvents(events.filter((_, j) => j !== i))
+                      }
+                      size="small"
+                      sx={{ ml: 2 }}
+                    >
+                      <Delete />
+                    </IconButton>
+                  )}
+                </Box>
+                <Box mb={1}>
+                  <MobileDatePicker
+                    label="Event Date"
+                    sx={{
+                      width: "100%",
+                    }}
+                    value={e.date}
+                    onChange={(date) => {
+                      setEvents(
+                        events.map((ev, idx) => {
+                          if (idx === i) {
+                            return {
+                              ...ev,
+                              date,
+                            };
+                          }
+                          return ev;
+                        })
+                      );
+                    }}
+                  />
+                </Box>
 
-            <Box mb={3}>
-              <Autocomplete
-                options={plans}
-                sx={{
-                  width: "100%",
-                }}
-                renderInput={(params) => (
-                  <TextField {...params} label="Select Program" />
-                )}
-                onChange={(e, v) => setSelectedPlan(v)}
-                getOptionLabel={(option) => option.name}
-                getOptionKey={(option) => option.id}
-              />
-            </Box>
+                <Box mb={3}>
+                  <Autocomplete
+                    options={plans}
+                    sx={{
+                      width: "100%",
+                    }}
+                    renderInput={(params) => (
+                      <TextField {...params} label="Select Program" />
+                    )}
+                    onChange={(e, v) => {
+                      setEvents(
+                        events.map((ev, idx) => {
+                          if (idx === i) {
+                            return {
+                              ...ev,
+                              plan: v,
+                            };
+                          }
+                          return ev;
+                        })
+                      );
+                    }}
+                    getOptionLabel={(option) => option.name}
+                    getOptionKey={(option) => option.id}
+                  />
+                </Box>
+              </React.Fragment>
+            ))}
           </>
         ) : (
           <DialogContentText>
@@ -189,6 +260,13 @@ export const CreateEventModal = ({
         )}
       </DialogContent>
       <DialogActions>
+        <Button
+          onClick={() => setEvents([...events, defaultEvent])}
+          sx={{ mr: "auto" }}
+          color="info"
+        >
+          Add Event
+        </Button>
         <Button onClick={handleClose}>Close</Button>
         <Button onClick={handleSubmit} disabled={loading} color="success">
           Create
