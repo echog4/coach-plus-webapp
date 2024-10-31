@@ -5,6 +5,7 @@ import {
   Button,
   CardActions,
   CardContent,
+  FormHelperText,
   Paper,
   TextField,
   Typography,
@@ -154,17 +155,26 @@ export const OnboardingFormDisplayRoute = () => {
                 rules={{ required: true }}
                 render={({ field }) => {
                   return (
-                    <MobileDatePicker
-                      label="Date of Birth"
-                      sx={{
-                        width: "100%",
-                      }}
-                      value={field.value}
-                      onChange={(date) => field.onChange(date)}
-                      error={errors.dob}
-                      helperText={errors.dob ? "This field is required" : ""}
-                      fullWidth
-                    />
+                    <>
+                      <MobileDatePicker
+                        label="Date of Birth"
+                        sx={{
+                          width: "100%",
+                          border: errors.dob ? "1px solid red" : "none",
+                          borderRadius: 1,
+                        }}
+                        value={field.value}
+                        onChange={(date) => field.onChange(date)}
+                        error={errors.dob}
+                        helperText={errors.dob ? "This field is required" : ""}
+                        fullWidth
+                      />
+                      {errors.dob && (
+                        <FormHelperText error>
+                          This field is required
+                        </FormHelperText>
+                      )}
+                    </>
                   );
                 }}
               />
@@ -174,6 +184,7 @@ export const OnboardingFormDisplayRoute = () => {
                 {...register("height", { required: true })}
                 label="Height in cm"
                 fullWidth
+                type="number"
                 error={errors.height}
                 helperText={errors.height ? "This field is required" : ""}
               />
@@ -183,19 +194,20 @@ export const OnboardingFormDisplayRoute = () => {
                 {...register("weight", { required: true })}
                 label="Weight in kg"
                 fullWidth
+                type="number"
                 error={errors.weight}
                 helperText={errors.weight ? "This field is required" : ""}
               />
             </Box>
-            {obf?.onboarding_forms?.custom_questions?.map((field) => (
+            {obf?.onboarding_forms?.custom_questions?.map((field, idx) => (
               <Box sx={{ mb: 3 }} key={field.name}>
                 <Typography>{field.name}</Typography>
                 <TextField
-                  {...register(`custom.${field.name}`, { required: true })}
+                  {...register(`custom${idx}`, { required: true })}
                   fullWidth
-                  error={errors[field.name]}
+                  error={errors[`custom${idx}`]}
                   helperText={
-                    errors[field.name] ? "This field is required" : ""
+                    errors[`custom${idx}`] ? "This field is required" : ""
                   }
                 />
               </Box>
