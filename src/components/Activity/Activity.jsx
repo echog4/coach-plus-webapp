@@ -9,6 +9,7 @@ import {
   Paper,
   Typography,
 } from "@mui/material";
+
 import { Insights } from "@mui/icons-material";
 
 export const Activity = ({ pic, name, info }) => {
