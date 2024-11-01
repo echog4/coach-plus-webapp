@@ -4,7 +4,6 @@ import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 
 import React from "react";
-
 import { AppHeader } from "./components/AppHeader/AppHeader";
 import { SideBar } from "./components/SideBar/SideBar";
 import { Route, Routes } from "react-router-dom";
